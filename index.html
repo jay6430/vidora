@@ -635,7 +635,11 @@ footer a:hover { color: var(--accent); }
         <div class="n">1</div>
         <div class="s">
           <h4>Download the installer</h4>
-          <a class="dl" href="https://raw.githubusercontent.com/jay6430/vidora/main/Vidora-Setup.bat" download>
+          <!-- Same-origin, relative URL. The download attribute is ignored on
+               cross-origin links, and raw.githubusercontent.com serves
+               everything as text/plain, so linking there shows the file
+               instead of saving it. -->
+          <a class="dl" href="Vidora-Setup.bat" download="Vidora-Setup.bat">
             <span class="ico">↓</span>
             <span>
               <b>Vidora-Setup.bat</b>

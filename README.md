@@ -82,9 +82,12 @@ browser.
 curl -fsSL https://raw.githubusercontent.com/jay6430/vidora/main/install.sh | bash
 ```
 
-**Windows** — download
-[**Vidora-Setup.bat**](https://raw.githubusercontent.com/jay6430/vidora/main/Vidora-Setup.bat)
-and double-click it. Nothing to type.
+**Windows** — get the installer from the
+[**project page**](https://jay6430.github.io/vidora/#install) and double-click
+it. Nothing to type.
+
+(Use that link rather than the file above — GitHub serves `.bat` files as plain
+text, so clicking one here displays it instead of downloading it.)
 
 Windows will show a blue "Windows protected your PC" box because the file came
 from the internet — click **More info**, then **Run anyway**. Every installer
