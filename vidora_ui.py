@@ -17,6 +17,7 @@ Creative Commons content, or anything you have permission for.
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
 import streamlit as st
@@ -218,7 +219,6 @@ def row_label(opt: dict) -> str:
 @st.cache_data(show_spinner=False, ttl=1800)
 def fetch_meta(url: str) -> dict:
     """Read metadata without downloading. Cached so re-runs stay instant."""
-    import yt_dlp
     with yt_dlp.YoutubeDL({"quiet": True, "no_warnings": True}) as ydl:
         meta = ydl.extract_info(url, download=False)
 
@@ -240,8 +240,6 @@ def fetch_meta(url: str) -> dict:
 
 def run_download(url: str, selection: dict, outdir: Path, efficient: bool):
     """Download and mux, driving a Streamlit progress bar from yt-dlp's hooks."""
-    import yt_dlp
-
     bar = st.progress(0.0)
     status = st.empty()
 
@@ -310,7 +308,25 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Dependency check up front, so nothing fails halfway through.
+# Dependency checks up front, so nothing fails halfway through - and so a
+# missing package is never reported as a bad URL.
+try:
+    import yt_dlp  # noqa: F401
+except ImportError:
+    st.markdown(
+        "<div class='v-warn'><b>yt-dlp is not installed in this Python.</b><br><br>"
+        f"Streamlit is running on <code>{sys.executable}</code>, and that "
+        "interpreter does not have yt-dlp. This almost always means Streamlit "
+        "was launched from a different environment than your virtualenv — the "
+        "command line tool can work perfectly while this page fails."
+        "<br><br><b>Launch it through the same Python:</b><br>"
+        "<code>python3 -m streamlit run vidora_ui.py</code>"
+        "<br><br><b>Or install yt-dlp into this one:</b><br>"
+        f"<code>{sys.executable} -m pip install -U yt-dlp</code></div>",
+        unsafe_allow_html=True,
+    )
+    st.stop()
+
 if not vidora.find_ffmpeg():
     st.markdown(
         "<div class='v-warn'><b>ffmpeg is missing.</b> It is what merges the "
