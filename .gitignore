@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+
+# local scratch copies
+*_backup.py
+*.bak
+.venv/
+venv/
+
+# downloaded media, in case anything lands in the project folder
+downloads/
+*.mp4
+*.mkv
+*.webm
+*.m4a
+*.part
+*.ytdl
+*.srt
+*.vtt
+
+.DS_Store
+Thumbs.db

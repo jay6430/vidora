@@ -1,0 +1,11 @@
+# Install with:  python3 -m pip install -r requirements.txt
+#
+# ffmpeg is a separate, non-Python dependency - see README.md.
+# If you cannot install system packages, `pip install imageio-ffmpeg`
+# provides a bundled copy that Vidora finds automatically.
+
+yt-dlp>=2025.1.1
+
+# Only needed for the local web UI (streamlit run vidora_ui.py).
+# The command line tool works without it.
+streamlit>=1.30

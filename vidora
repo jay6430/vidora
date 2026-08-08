@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Vidora - launcher for macOS and Linux.
+#
+# Author:   Jay Kadam <kadamjay100@gmail.com>
+# License:  MIT - see LICENSE
+#
+# Prefers the project's own virtualenv when one exists, so the tool works from
+# any directory without activating anything first. Add to ~/.zshrc:
+#
+#   alias vidora='/full/path/to/YT_Downloader/vidora'
+#
+set -euo pipefail
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ -x "$DIR/.venv/bin/python" ]; then
+    PY="$DIR/.venv/bin/python"
+elif command -v python3 >/dev/null 2>&1; then
+    PY="$(command -v python3)"
+elif command -v python >/dev/null 2>&1; then
+    PY="$(command -v python)"
+else
+    echo "Vidora: no Python interpreter found on PATH." >&2
+    exit 1
+fi
+
+exec "$PY" "$DIR/vidora.py" "$@"

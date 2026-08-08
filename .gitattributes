@@ -1,0 +1,19 @@
+# Keep line endings correct no matter which OS clones the repo.
+# Without this, git's autocrlf setting can rewrite the launchers and break
+# them on the platform they were written for.
+
+* text=auto
+
+# Windows launchers must keep CRLF - cmd.exe mis-parses LF-only batch files,
+# particularly multi-line if/else blocks.
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# POSIX shell and Python must keep LF - a CR at the end of a shebang line
+# makes the kernel look for an interpreter named "bash\r".
+vidora text eol=lf
+*.py   text eol=lf
+*.sh   text eol=lf
+
+# The launcher needs its executable bit preserved on clone.
+vidora text eol=lf

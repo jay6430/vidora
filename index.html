@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vidora — video and audio, one finished file</title>
+<meta name="description" content="Vidora downloads video at full resolution with the audio already merged. A cross-platform command line tool and local web UI by Jay Kadam.">
+<meta name="author" content="Jay Kadam">
+
+<meta property="og:title" content="Vidora — video and audio, one finished file">
+<meta property="og:description" content="Full resolution, audio already merged. One command instead of download, download, merge.">
+<meta property="og:type" content="website">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0b0c0f;
+  --surface: #131519;
+  --surface-2: #1a1d23;
+  --line: #23272f;
+  --text: #e9ebee;
+  --muted: #8d939f;
+  --faint: #5b616d;
+  --accent: #5eead4;
+  --accent-2: #2dd4bf;
+  --violet: #a78bfa;
+  --amber: #fbbf24;
+  --radius: 14px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(94,234,212,.09), transparent 62%),
+    radial-gradient(900px 520px at 88% 2%, rgba(167,139,250,.07), transparent 58%);
+  pointer-events: none; z-index: 0;
+}
+
+.wrap { position: relative; z-index: 1; max-width: 940px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------------- nav ---------------- */
+nav {
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(14px);
+  background: rgba(11,12,15,.72);
+  border-bottom: 1px solid transparent;
+  transition: border-color .3s ease;
+}
+nav.scrolled { border-bottom-color: var(--line); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+.nav-mark { font-weight: 700; font-size: 1.02rem; letter-spacing: -.02em; }
+.nav-mark span {
+  background: linear-gradient(100deg, var(--accent), var(--violet));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.nav-links { display: flex; gap: 26px; align-items: center; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: .875rem; transition: color .18s; }
+.nav-links a:hover { color: var(--text); }
+
+/* ---------------- hero ---------------- */
+header { padding: 88px 0 64px; text-align: center; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 999px; padding: 6px 15px;
+  font-size: .77rem; color: var(--muted); margin-bottom: 28px;
+}
+.pill b { color: var(--accent); font-weight: 600; }
+
+h1 {
+  font-size: clamp(2.9rem, 8vw, 4.6rem);
+  font-weight: 800; letter-spacing: -.045em; line-height: 1.02;
+  background: linear-gradient(100deg, #fff 8%, var(--accent) 52%, var(--violet) 96%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 18px;
+}
+
+.lede {
+  font-size: clamp(1.02rem, 2.4vw, 1.2rem);
+  color: var(--muted); max-width: 560px; margin: 0 auto 14px;
+  font-weight: 300;
+}
+.lede b { color: var(--text); font-weight: 500; }
+
+.byline { font-size: .84rem; color: var(--faint); margin-bottom: 36px; }
+
+.cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 11px 22px; border-radius: 11px;
+  font-size: .9rem; font-weight: 500; text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.btn-primary {
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  color: #06231f; font-weight: 600;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(94,234,212,.24); }
+.btn-ghost { background: var(--surface); border: 1px solid var(--line); color: var(--text); }
+.btn-ghost:hover { border-color: #39424f; transform: translateY(-2px); }
+
+/* ---------------- problem strip ---------------- */
+.problem { padding: 26px 0 8px; }
+.problem-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; }
+.pcard {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 20px 22px;
+}
+.pcard.bad { border-color: rgba(251,191,36,.22); }
+.pcard.good { border-color: rgba(94,234,212,.28); }
+.pcard h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--faint); margin-bottom: 12px; font-weight: 600; }
+.pcard ul { list-style: none; font-size: .875rem; color: var(--muted); }
+.pcard li { padding: 3px 0 3px 20px; position: relative; }
+.pcard.bad li::before { content: '×'; position: absolute; left: 4px; color: var(--amber); font-weight: 700; }
+.pcard.good li::before { content: '✓'; position: absolute; left: 2px; color: var(--accent); font-weight: 700; }
+.arrow { display: flex; align-items: center; color: var(--faint); font-size: 1.4rem; }
+
+/* ---------------- terminal ---------------- */
+.terminal-wrap { padding: 56px 0 24px; }
+.terminal {
+  background: #0e0f13; border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden;
+  box-shadow: 0 26px 70px rgba(0,0,0,.5);
+}
+.tbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 16px; background: var(--surface-2); border-bottom: 1px solid var(--line);
+}
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+.tbar span { margin-left: 8px; font-size: .74rem; color: var(--faint); font-family: 'JetBrains Mono', monospace; }
+
+.tbody {
+  padding: 20px 22px 24px; font-family: 'JetBrains Mono', monospace;
+  font-size: .795rem; line-height: 1.75; color: #cfd4dc;
+  white-space: pre; overflow-x: auto; min-height: 430px;
+}
+.tbody::-webkit-scrollbar { height: 7px; }
+.tbody::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+
+.c-dim { color: var(--faint); }
+.c-acc { color: var(--accent); }
+.c-vio { color: var(--violet); }
+.c-grn { color: #4ade80; }
+.c-wht { color: #fff; font-weight: 500; }
+.cursor { display: inline-block; width: 8px; background: var(--accent); animation: blink 1.05s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---------------- features ---------------- */
+section { padding: 74px 0; }
+.sec-head { text-align: center; margin-bottom: 44px; }
+.sec-head h2 { font-size: clamp(1.7rem, 4vw, 2.2rem); font-weight: 700; letter-spacing: -.03em; margin-bottom: 10px; }
+.sec-head p { color: var(--muted); font-size: .95rem; max-width: 520px; margin: 0 auto; font-weight: 300; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); gap: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 24px;
+  transition: transform .22s ease, border-color .22s ease;
+}
+.card:hover { transform: translateY(-3px); border-color: #333b47; }
+.card .ico {
+  width: 38px; height: 38px; border-radius: 10px; margin-bottom: 15px;
+  background: linear-gradient(135deg, rgba(94,234,212,.14), rgba(167,139,250,.12));
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.05rem;
+}
+.card h3 { font-size: .98rem; font-weight: 600; margin-bottom: 7px; }
+.card p { font-size: .86rem; color: var(--muted); font-weight: 300; line-height: 1.62; }
+
+/* ---------------- install ---------------- */
+.tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+.tab {
+  padding: 7px 17px; border-radius: 9px; font-size: .85rem;
+  background: var(--surface); border: 1px solid var(--line);
+  color: var(--muted); cursor: pointer; transition: all .18s;
+}
+.tab:hover { color: var(--text); }
+.tab.on { background: var(--surface-2); border-color: var(--accent-2); color: var(--accent); }
+
+.code {
+  background: #0e0f13; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px 22px; font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem; line-height: 1.95; color: #cfd4dc;
+  position: relative; overflow-x: auto;
+}
+.code .p { color: var(--accent); user-select: none; }
+.code .cm { color: var(--faint); }
+.copy {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--muted);
+  border-radius: 7px; padding: 5px 11px; font-size: .72rem; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all .18s;
+}
+.copy:hover { color: var(--accent); border-color: var(--accent-2); }
+
+.hidden { display: none; }
+
+/* ---------------- note ---------------- */
+.note {
+  background: rgba(251,191,36,.045); border: 1px solid rgba(251,191,36,.18);
+  border-left: 2px solid var(--amber);
+  border-radius: 11px; padding: 17px 20px; font-size: .87rem;
+  color: var(--muted); font-weight: 300; margin-top: 22px;
+}
+.note b { color: var(--text); font-weight: 600; }
+
+/* ---------------- thanks ---------------- */
+.thanks {
+  text-align: center; padding: 30px 26px;
+  background: linear-gradient(135deg, rgba(167,139,250,.07), rgba(94,234,212,.05));
+  border: 1px solid var(--line); border-radius: var(--radius);
+}
+.thanks .q { font-size: 1.05rem; color: var(--text); font-weight: 300; font-style: italic; }
+.thanks .n { font-size: .8rem; color: var(--faint); margin-top: 9px; }
+
+/* ---------------- footer ---------------- */
+footer { border-top: 1px solid var(--line); padding: 34px 0 46px; text-align: center; }
+footer p { font-size: .82rem; color: var(--faint); line-height: 2; }
+footer a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); }
+footer a:hover { color: var(--accent); }
+
+/* ---------------- reveal ---------------- */
+.rv { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+.rv.in { opacity: 1; transform: none; }
+
+@media (max-width: 720px) {
+  .problem-grid { grid-template-columns: 1fr; }
+  .arrow { transform: rotate(90deg); justify-content: center; }
+  .tbody { font-size: .69rem; min-height: 380px; }
+  header { padding: 56px 0 40px; }
+  .nav-links a:not(.btn) { display: none; }
+}
+</style>
+</head>
+
+<body>
+
+<nav id="nav">
+  <div class="wrap nav-inner">
+    <div class="nav-mark">◈ <span>Vidora</span></div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/jay6430/vidora">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header>
+    <div class="pill">◈ <b>v1.0.0</b> · macOS, Windows, Linux</div>
+    <h1>Video and audio,<br>one finished file.</h1>
+    <p class="lede">
+      Above 360p, video and audio arrive as <b>separate streams</b>.
+      That is why you get a silent 1080p file, or a 360p one with sound.
+      Vidora merges them for you.
+    </p>
+    <p class="byline">A command line tool and local web UI by Jay Kadam</p>
+    <div class="cta">
+      <a href="#install" class="btn btn-primary">Get started</a>
+      <a href="https://github.com/jay6430/vidora" class="btn btn-ghost">View source</a>
+    </div>
+  </header>
+
+  <div class="problem rv">
+    <div class="problem-grid">
+      <div class="pcard bad">
+        <h4>The usual routine</h4>
+        <ul>
+          <li>Download the silent video</li>
+          <li>Download the audio separately</li>
+          <li>Find a merging tool</li>
+          <li>Work out the ffmpeg flags</li>
+          <li>Repeat for every video</li>
+        </ul>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pcard good">
+        <h4>With Vidora</h4>
+        <ul>
+          <li>Paste the URL</li>
+          <li>Pick a resolution</li>
+          <li>Done</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="terminal-wrap rv" id="how">
+    <div class="terminal">
+      <div class="tbar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span>vidora — zsh</span>
+      </div>
+      <div class="tbody" id="term"></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-head rv">
+      <h2>Considered choices, not just downloads</h2>
+      <p>The details that turn a script into something you keep reaching for.</p>
+    </div>
+    <div class="grid rv">
+      <div class="card">
+        <div class="ico">◈</div>
+        <h3>Real resolutions only</h3>
+        <p>Reads what the site actually offers and lists one row per resolution — no invented options, no dead links.</p>
+      </div>
+      <div class="card">
+        <div class="ico">⇄</div>
+        <h3>MP4 wherever possible</h3>
+        <p>Prefers H.264 at each resolution so files play everywhere. Falls back to MKV only when the codec demands it, and says so.</p>
+      </div>
+      <div class="card">
+        <div class="ico">◷</div>
+        <h3>Honest size estimates</h3>
+        <p>Sizes include the audio track, so the number on screen is roughly what lands on disk.</p>
+      </div>
+      <div class="card">
+        <div class="ico">⌘</div>
+        <h3>One file, three platforms</h3>
+        <p>A single Python script with launchers for macOS, Linux, Windows cmd and PowerShell. Nothing to compile.</p>
+      </div>
+      <div class="card">
+        <div class="ico">◨</div>
+        <h3>Terminal or browser</h3>
+        <p>Use the CLI, or run the local web UI for a visual picker. Same engine underneath.</p>
+      </div>
+      <div class="card">
+        <div class="ico">⚑</div>
+        <h3>Fails early, not midway</h3>
+        <p>Checks for yt-dlp and ffmpeg on startup and names whatever is missing, with the exact install command.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="sec-head rv">
+      <h2>Up and running in a minute</h2>
+      <p>Python 3.8 or newer, plus two dependencies.</p>
+    </div>
+
+    <div class="tabs rv">
+      <div class="tab on" data-os="mac">macOS</div>
+      <div class="tab" data-os="win">Windows</div>
+      <div class="tab" data-os="linux">Linux</div>
+    </div>
+
+    <div class="code rv" id="code-mac">
+      <button class="copy" data-t="mac">Copy</button><span class="cm"># install the dependencies</span>
+<span class="p">$</span> brew install python ffmpeg
+
+<span class="cm"># get Vidora</span>
+<span class="p">$</span> git clone https://github.com/jay6430/vidora.git
+<span class="p">$</span> cd vidora
+<span class="p">$</span> pip install -r requirements.txt
+
+<span class="cm"># use it</span>
+<span class="p">$</span> python3 vidora.py "URL"
+
+<span class="cm"># or the web UI</span>
+<span class="p">$</span> streamlit run vidora_ui.py</div>
+
+    <div class="code hidden" id="code-win">
+      <button class="copy" data-t="win">Copy</button><span class="cm">:: install the dependencies</span>
+<span class="p">></span> winget install Python.Python.3.12
+<span class="p">></span> winget install Gyan.FFmpeg
+
+<span class="cm">:: get Vidora</span>
+<span class="p">></span> git clone https://github.com/jay6430/vidora.git
+<span class="p">></span> cd vidora
+<span class="p">></span> pip install -r requirements.txt
+
+<span class="cm">:: use it</span>
+<span class="p">></span> vidora.bat "URL"
+
+<span class="cm">:: or the web UI</span>
+<span class="p">></span> streamlit run vidora_ui.py</div>
+
+    <div class="code hidden" id="code-linux">
+      <button class="copy" data-t="linux">Copy</button><span class="cm"># install the dependencies</span>
+<span class="p">$</span> sudo apt install python3 python3-pip ffmpeg
+
+<span class="cm"># get Vidora</span>
+<span class="p">$</span> git clone https://github.com/jay6430/vidora.git
+<span class="p">$</span> cd vidora
+<span class="p">$</span> pip install -r requirements.txt
+
+<span class="cm"># use it</span>
+<span class="p">$</span> ./vidora "URL"
+
+<span class="cm"># or the web UI</span>
+<span class="p">$</span> streamlit run vidora_ui.py</div>
+
+    <div class="note rv">
+      <b>Runs on your machine, by design.</b> Vidora is not a hosted service and
+      there is no public instance. Downloading generally runs against a site's
+      terms of service, so please use it for your own uploads, Creative Commons
+      material, or content you have permission for.
+    </div>
+  </section>
+
+  <section>
+    <div class="thanks rv">
+      <p class="q">“Thanks to Ishan Mistry, whose idea set Vidora in motion.”</p>
+      <p class="n">Every tool starts with someone noticing the problem.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>
+      <b style="color:var(--muted)">Vidora</b> v1.0.0 · © 2026
+      <a href="mailto:kadamjay100@gmail.com">Jay Kadam</a> · MIT licensed<br>
+      Built on <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a> and
+      <a href="https://ffmpeg.org/">FFmpeg</a>, which keep their own licenses.
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ---- nav shadow ---- */
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 10));
+
+/* ---- reveal on scroll ---- */
+const io = new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: .12 });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+/* ---- install tabs ---- */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+    tab.classList.add('on');
+    ['mac', 'win', 'linux'].forEach(os =>
+      document.getElementById('code-' + os).classList.toggle('hidden', os !== tab.dataset.os));
+  };
+});
+
+/* ---- copy buttons ---- */
+document.querySelectorAll('.copy').forEach(btn => {
+  btn.onclick = () => {
+    const block = document.getElementById('code-' + btn.dataset.t);
+    const text = block.innerText.replace(/^Copy\n/, '')
+      .split('\n').map(l => l.replace(/^[$>]\s?/, '')).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied';
+      setTimeout(() => btn.textContent = 'Copy', 1600);
+    });
+  };
+});
+
+/* ---- terminal typing demo ---- */
+const LINES = [
+  { t: '<span class="c-acc">$</span> vidora "https://…"', d: 340 },
+  { t: '', d: 90 },
+  { t: '<span class="c-dim">  ╭─────────────────────────────────────────────────╮</span>', d: 26 },
+  { t: '<span class="c-dim">  │</span>  <span class="c-acc">VIDORA</span> <span class="c-dim">·  video and audio, one finished file</span>   <span class="c-dim">│</span>', d: 26 },
+  { t: '<span class="c-dim">  ╰─────────────────────────────────────────────────╯</span>', d: 26 },
+  { t: '<span class="c-dim">              v1.0.0   ·   © 2026 Jay Kadam   ·   MIT</span>', d: 240 },
+  { t: '', d: 90 },
+  { t: '<span class="c-dim">  ·</span> reading available formats …', d: 520 },
+  { t: '', d: 90 },
+  { t: '   <span class="c-wht">Big Buck Bunny 60fps 4K</span>', d: 34 },
+  { t: '   <span class="c-dim">Blender Foundation  ·  10:34</span>', d: 220 },
+  { t: '', d: 60 },
+  { t: '<span class="c-dim">      #   RESOLUTION      CODEC         SIZE   FILE</span>', d: 34 },
+  { t: '<span class="c-dim">   ───────────────────────────────────────────────────</span>', d: 34 },
+  { t: '      <span class="c-acc">1</span>   2160p 60fps     <span class="c-dim">VP9</span>        ~1.3 GB   <span class="c-dim">.mkv</span>', d: 46 },
+  { t: '      <span class="c-acc">2</span>   1440p 60fps     <span class="c-dim">VP9</span>      ~480.8 MB   <span class="c-dim">.mkv</span>', d: 46 },
+  { t: '      <span class="c-acc">3</span>   1080p 60fps     <span class="c-dim">H.264</span>    ~275.0 MB   <span class="c-dim">.mp4</span>  <span class="c-grn">← plays anywhere</span>', d: 46 },
+  { t: '      <span class="c-acc">4</span>   720p 60fps      <span class="c-dim">H.264</span>    ~172.9 MB   <span class="c-dim">.mp4</span>', d: 46 },
+  { t: '      <span class="c-acc">5</span>   480p 30fps      <span class="c-dim">H.264</span>     ~56.2 MB   <span class="c-dim">.mp4</span>', d: 46 },
+  { t: '<span class="c-dim">   ───────────────────────────────────────────────────</span>', d: 300 },
+  { t: '', d: 60 },
+  { t: '   <span class="c-wht">Which one?</span> <span class="c-dim">[1-5, Enter = 1]</span> <span class="c-acc">3</span>', d: 560 },
+  { t: '', d: 90 },
+  { t: '<span class="c-dim">  ·</span> saving to <span class="c-acc">~/Movies/Vidora</span>', d: 300 },
+  { t: '', d: 60 },
+  { t: '   <span class="c-dim">video</span> <span class="c-acc">████████████████░░░░░░░░</span>  67%     8.4 MB/s   <span class="c-dim">eta 0:14</span>', d: 460 },
+  { t: '   <span class="c-dim">audio</span> <span class="c-acc">████████████████████████</span> 100%    11.2 MB/s   <span class="c-dim">eta 0:00</span>', d: 300 },
+  { t: '<span class="c-dim">  ·</span> merging video and audio <span class="c-dim">(ffmpeg)</span>', d: 640 },
+  { t: '', d: 60 },
+  { t: '  <span class="c-grn">Done</span>  <span class="c-dim">~/Movies/Vidora</span>', d: 60 },
+  { t: '  <span class="c-vio">Thanks to Ishan Mistry, whose idea set Vidora in motion.</span>', d: 2600 }
+];
+
+const term = document.getElementById('term');
+let started = false;
+
+function play() {
+  let i = 0;
+  term.innerHTML = '';
+  const step = () => {
+    if (i >= LINES.length) { setTimeout(play, 1400); return; }
+    const l = LINES[i++];
+    term.innerHTML += (l.t || '') + '\n';
+    term.scrollTop = term.scrollHeight;
+    setTimeout(step, l.d);
+  };
+  step();
+}
+
+new IntersectionObserver((es, obs) => {
+  es.forEach(e => { if (e.isIntersecting && !started) { started = true; play(); obs.disconnect(); } });
+}, { threshold: .25 }).observe(term);
+</script>
+
+</body>
+</html>
