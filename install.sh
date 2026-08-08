@@ -58,6 +58,14 @@ else
     DIR=""
 fi
 
+# Piped from curl, so there is no script file to locate. If the current folder
+# is already a Vidora install, use it - otherwise re-running from inside the
+# project (which is where you land after Ctrl+C) would nest a fresh copy
+# underneath it every time.
+if [ -z "$DIR" ] && [ -f "$PWD/vidora.py" ]; then
+    DIR="$PWD"
+fi
+
 banner
 
 if [ -z "$DIR" ] || [ ! -f "$DIR/vidora.py" ]; then

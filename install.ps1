@@ -51,8 +51,18 @@ Show-Banner
 # ---------------------------------------------------------------- locate repo
 
 $dir = $null
+
+# Running from the script file itself.
 if ($PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "vidora.py"))) {
     $dir = $PSScriptRoot
+}
+
+# Piped through iex, so $PSScriptRoot is null. If the current folder is
+# already a Vidora install, use it - otherwise re-running from inside the
+# project would nest a fresh copy underneath it every time.
+if (-not $dir -and (Test-Path (Join-Path (Get-Location) "vidora.py"))) {
+    $dir = (Get-Location).Path
+    Write-Step "Already inside a Vidora folder, using it"
 }
 
 if (-not $dir) {
@@ -96,7 +106,22 @@ if (-not $dir) {
         }
 
         New-Item -ItemType Directory -Force -Path $target | Out-Null
-        Copy-Item -Path (Join-Path $extracted "*") -Destination $target -Recurse -Force
+
+        # Copy file by file, recreating folders as needed. Copy-Item -Recurse
+        # -Force throws "Container cannot be copied onto existing leaf item"
+        # when the destination already has directories, and this also leaves
+        # an existing .venv untouched.
+        $prefix = $extracted.TrimEnd('\') + '\'
+        Get-ChildItem -Path $extracted -Recurse -File | ForEach-Object {
+            $relative = $_.FullName.Substring($prefix.Length)
+            $destination = Join-Path $target $relative
+            $parent = Split-Path $destination -Parent
+            if (-not (Test-Path $parent)) {
+                New-Item -ItemType Directory -Force -Path $parent | Out-Null
+            }
+            Copy-Item $_.FullName -Destination $destination -Force
+        }
+
         Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
         Write-Good "Downloaded"
     }
