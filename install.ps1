@@ -73,25 +73,53 @@ function Show-Banner {
 function Invoke-Native {
     param(
         [Parameter(Mandatory)][string]$File,
-        [string[]]$Arguments = @(),
-        [switch]$Quiet
+        [string[]]$Arguments = @()
     )
-    $out = [System.IO.Path]::GetTempFileName()
-    $err = [System.IO.Path]::GetTempFileName()
+
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName               = $File
+    $psi.UseShellExecute        = $false
+    $psi.CreateNoWindow         = $true
+    $psi.RedirectStandardInput  = $true
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError  = $true
+
+    # Windows PowerShell 5.1 runs on .NET Framework, which has no ArgumentList,
+    # so build one string and quote anything containing a space.
+    $psi.Arguments = ($Arguments | ForEach-Object {
+        if ($_ -match '[\s"]') { '"' + ($_ -replace '"', '\"') + '"' } else { $_ }
+    }) -join ' '
+
     try {
-        $p = Start-Process -FilePath $File -ArgumentList $Arguments `
-                -NoNewWindow -Wait -PassThru `
-                -RedirectStandardOutput $out -RedirectStandardError $err
-        if (-not $Quiet -and $p.ExitCode -ne 0) {
-            $tail = (Get-Content $err -ErrorAction SilentlyContinue | Select-Object -Last 3) -join "`n     "
-            if ($tail) { Write-Warn $tail }
+        $p = New-Object System.Diagnostics.Process
+        $p.StartInfo = $psi
+        [void]$p.Start()
+
+        # Close stdin immediately. Anything that tries to read it gets EOF
+        # instead of waiting on the console - this is what stops setup
+        # pausing for a keypress partway through.
+        $p.StandardInput.Close()
+
+        # Drain both streams before waiting; a full pipe buffer deadlocks.
+        $stdout = $p.StandardOutput.ReadToEnd()
+        $stderr = $p.StandardError.ReadToEnd()
+        $p.WaitForExit()
+
+        return [pscustomobject]@{
+            ExitCode = $p.ExitCode
+            Output   = (($stdout, $stderr) -join "`n").Trim()
         }
-        return $p.ExitCode
     } catch {
-        return 1
-    } finally {
-        Remove-Item $out, $err -Force -ErrorAction SilentlyContinue
+        return [pscustomobject]@{ ExitCode = 1; Output = $_.Exception.Message }
     }
+}
+
+# Shorten a command's output to something readable in an error message.
+function Format-Output {
+    param([string]$Text, [int]$Lines = 6)
+    if (-not $Text) { return "(no output)" }
+    $kept = ($Text -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -Last $Lines)
+    return ($kept -join "`n          ")
 }
 
 # Pick up PATH changes made by an installer we just ran, without needing the
@@ -149,7 +177,7 @@ function Install-Python {
     Write-Step "Python not found - installing it for you (a few minutes)..."
 
     if (Get-Command winget -ErrorAction SilentlyContinue) {
-        Invoke-Native -File "winget" -Quiet -Arguments @(
+        Invoke-Native -File "winget" -Arguments @(
             "install", "--id", "Python.Python.3.12", "--silent",
             "--accept-package-agreements", "--accept-source-agreements",
             "--disable-interactivity"
@@ -173,7 +201,7 @@ Could not download Python.
     }
 
     Write-Step "Running the Python installer..."
-    Invoke-Native -File $exe -Quiet -Arguments @(
+    Invoke-Native -File $exe -Arguments @(
         "/quiet", "InstallAllUsers=0", "PrependPath=1",
         "Include_pip=1", "Include_launcher=1", "Include_test=0"
     ) | Out-Null
@@ -298,7 +326,7 @@ if (Get-Command ffmpeg -ErrorAction SilentlyContinue) {
     Write-Good "ffmpeg: already installed"
 } elseif (Get-Command winget -ErrorAction SilentlyContinue) {
     Write-Step "Installing ffmpeg (this can take a minute)..."
-    Invoke-Native -File "winget" -Quiet -Arguments @(
+    Invoke-Native -File "winget" -Arguments @(
         "install", "--id", "Gyan.FFmpeg", "--silent",
         "--accept-package-agreements", "--accept-source-agreements",
         "--disable-interactivity"
@@ -317,40 +345,68 @@ if (Get-Command ffmpeg -ErrorAction SilentlyContinue) {
 
 # ---------------------------------------------------------------- virtualenv
 
-if (-not (Test-Path $venvPy)) {
+function New-Venv {
     Write-Step "Creating an isolated environment..."
-    Invoke-Native -File $py -Arguments @("-m", "venv", ".venv") | Out-Null
-    if (-not (Test-Path $venvPy)) { Write-Fail "Could not create a virtualenv." }
+    $r = Invoke-Native -File $py -Arguments @("-m", "venv", ".venv")
+    if (-not (Test-Path $venvPy)) {
+        Write-Fail "Could not create a virtualenv.`n          $(Format-Output $r.Output)"
+    }
     Write-Good "Environment created"
-} else {
-    Write-Good "Environment: already set up"
 }
 
-# ---------------------------------------------------------------- packages
+function Install-Packages {
+    Write-Step "Installing packages (this is the slow part, please wait)..."
 
-Write-Step "Installing packages (this is the slow part)..."
-Invoke-Native -File $venvPy -Quiet -Arguments @("-m", "pip", "install", "--quiet", "--upgrade", "pip") | Out-Null
+    Invoke-Native -File $venvPy -Arguments @(
+        "-m", "pip", "install", "--quiet", "--disable-pip-version-check",
+        "--upgrade", "pip") | Out-Null
 
-$code = Invoke-Native -File $venvPy -Arguments @("-m", "pip", "install", "--quiet", "--upgrade", "-r", "requirements.txt")
-if ($code -ne 0) {
-    Write-Fail "Could not install the Python packages. Check your internet connection."
+    $r = Invoke-Native -File $venvPy -Arguments @(
+        "-m", "pip", "install", "--disable-pip-version-check",
+        "--upgrade", "-r", "requirements.txt")
+    if ($r.ExitCode -ne 0) {
+        Write-Fail "Could not install the Python packages.`n          $(Format-Output $r.Output)"
+    }
+
+    if ($ffmpegViaPip) {
+        $r = Invoke-Native -File $venvPy -Arguments @(
+            "-m", "pip", "install", "--disable-pip-version-check", "imageio-ffmpeg")
+        if ($r.ExitCode -ne 0) {
+            Write-Fail "Could not install ffmpeg.`n          $(Format-Output $r.Output)"
+        }
+    }
+
+    Write-Good "Packages installed"
 }
 
-if ($ffmpegViaPip) {
-    $code = Invoke-Native -File $venvPy -Arguments @("-m", "pip", "install", "--quiet", "imageio-ffmpeg")
-    if ($code -ne 0) { Write-Fail "Could not install ffmpeg." }
-}
-
-Write-Good "Packages installed"
+if (-not (Test-Path $venvPy)) { New-Venv } else { Write-Good "Environment: already set up" }
+Install-Packages
 
 # ---------------------------------------------------------------- verify
 
-if ((Invoke-Native -File $venvPy -Quiet -Arguments @("-c", "import yt_dlp, streamlit")) -ne 0) {
-    Write-Fail "Something did not install correctly. Delete the .venv folder and run this again."
+# A half-finished earlier run can leave a venv that looks fine but cannot
+# import anything. Rather than telling you to delete a folder, rebuild it once
+# and try again.
+$check = Invoke-Native -File $venvPy -Arguments @("-c", "import yt_dlp, streamlit")
+
+if ($check.ExitCode -ne 0) {
+    Write-Warn "The environment looks incomplete - rebuilding it once..."
+    Remove-Item (Join-Path $dir ".venv") -Recurse -Force -ErrorAction SilentlyContinue
+    New-Venv
+    Install-Packages
+    $check = Invoke-Native -File $venvPy -Arguments @("-c", "import yt_dlp, streamlit")
 }
-if ((Invoke-Native -File $venvPy -Quiet -Arguments @("-c", "import vidora, sys; sys.exit(0 if vidora.find_ffmpeg() else 1)")) -ne 0) {
-    Write-Fail "ffmpeg could not be found even after setup."
+
+if ($check.ExitCode -ne 0) {
+    Write-Fail "Python packages still will not load.`n          $(Format-Output $check.Output)"
 }
+
+$ff = Invoke-Native -File $venvPy -Arguments @(
+    "-c", "import vidora, sys; sys.exit(0 if vidora.find_ffmpeg() else 1)")
+if ($ff.ExitCode -ne 0) {
+    Write-Fail "ffmpeg could not be found even after setup.`n          $(Format-Output $ff.Output)"
+}
+
 Write-Good "Everything checks out"
 
 # ---------------------------------------------------------------- shortcuts
