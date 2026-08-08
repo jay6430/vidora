@@ -82,15 +82,23 @@ browser.
 curl -fsSL https://raw.githubusercontent.com/jay6430/vidora/main/install.sh | bash
 ```
 
-**Windows** — click Start, type **PowerShell**, open it, then paste:
+**Windows** — download
+[**Vidora-Setup.bat**](https://raw.githubusercontent.com/jay6430/vidora/main/Vidora-Setup.bat)
+and double-click it. Nothing to type.
+
+Windows will show a blue "Windows protected your PC" box because the file came
+from the internet — click **More info**, then **Run anyway**. Every installer
+that is not commercially code-signed gets this.
+
+Setup installs Python and ffmpeg if they are missing, so a completely fresh
+machine needs nothing prepared. It also adds a **Vidora** icon to your Desktop;
+after the first run, that is all you need.
+
+Prefer PowerShell? This does the same thing:
 
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force; irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex
 ```
-
-The first half grants permission to run the installer for your user account
-only. It is bundled into the same line so nobody hits a permissions error part
-way through.
 
 **Linux** — press `Ctrl Alt T`, then paste:
 
@@ -103,18 +111,22 @@ installed and skips straight to launching.
 
 ### What the installer does
 
-Nothing hidden, and nothing outside the project folder:
+Nothing hidden:
 
-1. Checks for Python 3.8+ and stops with instructions if it is missing
-2. Installs ffmpeg via Homebrew, apt or winget — or falls back to a
-   pip-packaged build that needs no admin rights
-3. Creates a `.venv` inside the project folder
-4. Installs yt-dlp and Streamlit into that venv only
-5. Verifies both imports and that ffmpeg is reachable
-6. Launches the web UI
+1. Downloads the project (no git required — it falls back to the ZIP GitHub
+   publishes)
+2. Finds Python 3.8+. **On Windows, installs it if missing** — via winget, or
+   the official python.org installer, per-user so no admin prompt appears
+3. Installs ffmpeg via Homebrew, apt or winget — or falls back to a
+   pip-packaged build that needs no admin rights at all
+4. Creates a `.venv` inside the project folder
+5. Installs yt-dlp and Streamlit into that venv only
+6. Verifies both imports and that ffmpeg is actually reachable
+7. On Windows, adds Desktop and Start Menu shortcuts
+8. Launches the app
 
-It never installs anything system-wide except ffmpeg, and never touches your
-global Python packages.
+Your global Python packages are never touched. Everything lives in the project
+folder, so uninstalling is just deleting it (plus the two shortcuts).
 
 **Prefer to inspect before running?** Reasonable — piping a script from the
 internet into your shell is worth being careful about:
@@ -239,7 +251,9 @@ vidora/
 ├── vidora.py           the tool
 ├── vidora_ui.py        local web UI (Streamlit)
 ├── install.sh          one-command setup + launcher (macOS / Linux)
-├── install.ps1         one-command setup + launcher (Windows)
+├── install.ps1         setup + launcher engine (Windows)
+├── Vidora-Setup.bat    double-click installer (Windows)
+├── Start-Vidora.bat    opens the app — what the Desktop shortcut runs
 ├── vidora              launcher — macOS / Linux
 ├── vidora.bat          launcher — Windows (cmd)
 ├── vidora.ps1          launcher — Windows (PowerShell)

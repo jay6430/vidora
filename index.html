@@ -349,6 +349,42 @@ kbd {
   color: var(--text);
 }
 
+/* download button for the Windows installer */
+.dl {
+  display: flex; align-items: center; gap: 14px; margin-top: 4px;
+  padding: 14px 18px; border-radius: 11px; text-decoration: none;
+  background: linear-gradient(100deg, rgba(94,234,212,.13), rgba(45,212,191,.09));
+  border: 1px solid rgba(94,234,212,.32);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.dl:hover {
+  transform: translateY(-2px); border-color: var(--accent-2);
+  box-shadow: 0 10px 28px rgba(94,234,212,.16);
+}
+.dl .ico {
+  width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  color: #06231f; font-weight: 700; font-size: 1.05rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.dl b { display: block; color: var(--text); font-size: .95rem; font-weight: 600; }
+.dl em {
+  display: block; color: var(--muted); font-size: .79rem;
+  font-style: normal; font-weight: 300; margin-top: 1px;
+}
+
+/* collapsed alternative for people who would rather use a terminal */
+.adv { margin-top: 18px; }
+.adv summary {
+  cursor: pointer; color: var(--faint); font-size: .82rem;
+  padding: 9px 14px; list-style: none;
+}
+.adv summary::-webkit-details-marker { display: none; }
+.adv summary::before { content: '▸ '; }
+.adv[open] summary::before { content: '▾ '; }
+.adv summary:hover { color: var(--muted); }
+.adv .code { margin-top: 10px; }
+
 .reopen {
   margin-top: 26px; padding: 16px 20px;
   background: var(--surface); border: 1px solid var(--line);
@@ -598,29 +634,41 @@ footer a:hover { color: var(--accent); }
       <div class="step">
         <div class="n">1</div>
         <div class="s">
-          <h4>Open PowerShell</h4>
-          <p>Click <b>Start</b>, type <b>PowerShell</b>, click <b>Windows PowerShell</b>.
-             A blue window appears — that is the right one.</p>
+          <h4>Download the installer</h4>
+          <a class="dl" href="https://raw.githubusercontent.com/jay6430/vidora/main/Vidora-Setup.bat" download>
+            <span class="ico">↓</span>
+            <span>
+              <b>Vidora-Setup.bat</b>
+              <em>Free · no account · nothing to configure</em>
+            </span>
+          </a>
         </div>
       </div>
       <div class="step">
         <div class="n">2</div>
         <div class="s">
-          <h4>Paste this line and press Enter</h4>
-          <div class="code"><button class="copy" data-t="win">Copy</button><span class="oneline">Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force; irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex</span></div>
-          <p>Right-click pastes in PowerShell. The first half of that line is
-             Windows' permission to run the installer — it is included so you
-             will not hit an error part way through.</p>
+          <h4>Double-click it</h4>
+          <p>Windows may show a blue <b>"Windows protected your PC"</b> box,
+             because the file was downloaded from the internet. Click
+             <b>More info</b>, then <b>Run anyway</b>. This happens to every
+             installer that is not commercially code-signed.</p>
         </div>
       </div>
       <div class="step">
         <div class="n">3</div>
         <div class="s">
-          <h4>Wait, then use it</h4>
-          <p>It installs what it needs and opens Vidora in your browser.
-             The first time takes a few minutes. After that it opens in seconds.</p>
+          <h4>That is it</h4>
+          <p>It installs Python and ffmpeg if you do not already have them,
+             sets everything up, and opens Vidora in your browser. Takes a few
+             minutes the first time. It also puts a <b>Vidora</b> icon on your
+             Desktop — after this, just double-click that.</p>
         </div>
       </div>
+
+      <details class="adv">
+        <summary>Prefer PowerShell?</summary>
+        <div class="code"><button class="copy" data-t="win">Copy</button><span class="oneline">Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force; irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex</span></div>
+      </details>
     </div>
 
     <div class="steps hidden" id="steps-linux">
@@ -652,8 +700,9 @@ footer a:hover { color: var(--accent); }
 
     <div class="reopen rv">
       <b>Opening it again later</b>
-      <p>Run the same line any time — it remembers what is already installed
-         and just opens Vidora. Nothing gets installed twice.</p>
+      <p>On Windows, double-click the <b>Vidora</b> icon on your Desktop. On
+         macOS and Linux, run the same line again — it remembers what is
+         already installed and goes straight to opening the app.</p>
     </div>
 
     <div class="note rv">
