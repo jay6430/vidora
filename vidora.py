@@ -27,7 +27,7 @@ import sys
 from pathlib import Path
 
 __app__ = "Vidora"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "Jay Kadam"
 __email__ = "kadamjay100@gmail.com"
 __license__ = "MIT"

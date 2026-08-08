@@ -23,6 +23,10 @@ param(
 $ErrorActionPreference = "Stop"
 $ProgressPreference    = "SilentlyContinue"   # progress bars make downloads crawl
 
+# Bumped on every change to the installer, so you can confirm at a glance that
+# the machine actually fetched the newest version rather than a cached one.
+$SetupVersion = "1.1.0"
+
 $RepoUrl     = "https://github.com/jay6430/vidora.git"
 $ZipUrl      = "https://github.com/jay6430/vidora/archive/refs/heads/main.zip"
 $RepoDirName = "vidora"
@@ -54,7 +58,7 @@ function Show-Banner {
     Write-Host "VIDORA" -ForegroundColor Cyan -NoNewline
     Write-Host "  -  HD video downloads, with the sound included  |" -ForegroundColor DarkGray
     Write-Host "  +----------------------------------------------------------+" -ForegroundColor DarkGray
-    Write-Host "                        (c) 2026 Jay Kadam  -  MIT setup" -ForegroundColor DarkGray
+    Write-Host "                  Setup v$SetupVersion  -  (c) 2026 Jay Kadam  -  MIT" -ForegroundColor DarkGray
     Write-Host "    Thanks to Ishan Mistry, whose idea set Vidora in motion." -ForegroundColor DarkGray
     Write-Host ""
 }
@@ -73,7 +77,8 @@ function Show-Banner {
 function Invoke-Native {
     param(
         [Parameter(Mandatory)][string]$File,
-        [string[]]$Arguments = @()
+        [string[]]$Arguments = @(),
+        [string]$WorkingDirectory
     )
 
     $psi = New-Object System.Diagnostics.ProcessStartInfo
@@ -83,6 +88,13 @@ function Invoke-Native {
     $psi.RedirectStandardInput  = $true
     $psi.RedirectStandardOutput = $true
     $psi.RedirectStandardError  = $true
+
+    # Set-Location moves PowerShell's location but NOT the process working
+    # directory that .NET hands to a child. Without this, "python -m venv
+    # .venv" creates the folder wherever the installer was double-clicked -
+    # usually Downloads - and setup then cannot find what it just made.
+    if (-not $WorkingDirectory) { $WorkingDirectory = (Get-Location).Path }
+    $psi.WorkingDirectory = $WorkingDirectory
 
     # Windows PowerShell 5.1 runs on .NET Framework, which has no ArgumentList,
     # so build one string and quote anything containing a space.
@@ -293,6 +305,10 @@ if (-not $dir) {
 }
 
 Set-Location $dir
+# Keep .NET's idea of the working directory in step with PowerShell's, so any
+# child process and any relative path resolve against the project folder.
+[Environment]::CurrentDirectory = $dir
+
 $venvPy = Join-Path $dir ".venv\Scripts\python.exe"
 
 # ---------------------------------------------------------------- launch only
@@ -347,7 +363,9 @@ if (Get-Command ffmpeg -ErrorAction SilentlyContinue) {
 
 function New-Venv {
     Write-Step "Creating an isolated environment..."
-    $r = Invoke-Native -File $py -Arguments @("-m", "venv", ".venv")
+    # Absolute target, so it cannot land anywhere but the project folder.
+    $venvPath = Join-Path $dir ".venv"
+    $r = Invoke-Native -File $py -Arguments @("-m", "venv", $venvPath) -WorkingDirectory $dir
     if (-not (Test-Path $venvPy)) {
         Write-Fail "Could not create a virtualenv.`n          $(Format-Output $r.Output)"
     }
@@ -357,19 +375,21 @@ function New-Venv {
 function Install-Packages {
     Write-Step "Installing packages (this is the slow part, please wait)..."
 
-    Invoke-Native -File $venvPy -Arguments @(
+    Invoke-Native -File $venvPy -WorkingDirectory $dir -Arguments @(
         "-m", "pip", "install", "--quiet", "--disable-pip-version-check",
         "--upgrade", "pip") | Out-Null
 
-    $r = Invoke-Native -File $venvPy -Arguments @(
+    # Absolute path to requirements.txt for the same reason.
+    $req = Join-Path $dir "requirements.txt"
+    $r = Invoke-Native -File $venvPy -WorkingDirectory $dir -Arguments @(
         "-m", "pip", "install", "--disable-pip-version-check",
-        "--upgrade", "-r", "requirements.txt")
+        "--upgrade", "-r", $req)
     if ($r.ExitCode -ne 0) {
         Write-Fail "Could not install the Python packages.`n          $(Format-Output $r.Output)"
     }
 
     if ($ffmpegViaPip) {
-        $r = Invoke-Native -File $venvPy -Arguments @(
+        $r = Invoke-Native -File $venvPy -WorkingDirectory $dir -Arguments @(
             "-m", "pip", "install", "--disable-pip-version-check", "imageio-ffmpeg")
         if ($r.ExitCode -ne 0) {
             Write-Fail "Could not install ffmpeg.`n          $(Format-Output $r.Output)"
@@ -387,7 +407,7 @@ Install-Packages
 # A half-finished earlier run can leave a venv that looks fine but cannot
 # import anything. Rather than telling you to delete a folder, rebuild it once
 # and try again.
-$check = Invoke-Native -File $venvPy -Arguments @("-c", "import yt_dlp, streamlit")
+$check = Invoke-Native -File $venvPy -WorkingDirectory $dir -Arguments @("-c", "import yt_dlp, streamlit")
 
 if ($check.ExitCode -ne 0) {
     Write-Warn "The environment looks incomplete - rebuilding it once..."
@@ -401,7 +421,9 @@ if ($check.ExitCode -ne 0) {
     Write-Fail "Python packages still will not load.`n          $(Format-Output $check.Output)"
 }
 
-$ff = Invoke-Native -File $venvPy -Arguments @(
+# Must run from the project folder - "import vidora" resolves vidora.py from
+# the working directory.
+$ff = Invoke-Native -File $venvPy -WorkingDirectory $dir -Arguments @(
     "-c", "import vidora, sys; sys.exit(0 if vidora.find_ffmpeg() else 1)")
 if ($ff.ExitCode -ne 0) {
     Write-Fail "ffmpeg could not be found even after setup.`n          $(Format-Output $ff.Output)"

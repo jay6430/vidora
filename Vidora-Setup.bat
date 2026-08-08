@@ -13,11 +13,15 @@ REM ===========================================================================
 setlocal
 title Vidora Setup
 
+REM Bump this on every change so a stale download is obvious at a glance.
+set "SETUP_VERSION=1.1.0"
+
 set "PS1=%TEMP%\vidora-install.ps1"
 set "URL=https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1"
 
 echo.
-echo   Getting the Vidora installer...
+echo   Vidora Setup %SETUP_VERSION%
+echo   Getting the installer...
 echo.
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^

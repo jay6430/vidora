@@ -368,6 +368,10 @@ kbd {
   display: flex; align-items: center; justify-content: center;
 }
 .dl b { display: block; color: var(--text); font-size: .95rem; font-weight: 600; }
+.dl .ver {
+  color: var(--accent); font-weight: 500; font-size: .78rem;
+  font-family: 'JetBrains Mono', monospace; margin-left: 4px;
+}
 .dl em {
   display: block; color: var(--muted); font-size: .79rem;
   font-style: normal; font-weight: 300; margin-top: 1px;
@@ -642,7 +646,7 @@ footer a:hover { color: var(--accent); }
           <a class="dl" href="Vidora-Setup.bat" download="Vidora-Setup.bat">
             <span class="ico">↓</span>
             <span>
-              <b>Vidora-Setup.bat</b>
+              <b>Vidora-Setup.bat <span class="ver">v1.1.0</span></b>
               <em>Free · no account · nothing to configure</em>
             </span>
           </a>
