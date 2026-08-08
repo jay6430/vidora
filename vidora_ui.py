@@ -300,7 +300,7 @@ st.markdown(
     f"""
     <div class="v-head">
         <div class="v-mark">Vidora</div>
-        <div class="v-tag">Download videos in HD — with the sound included.</div>
+        <div class="v-tag">Download YouTube videos in HD — with the sound included.</div>
         <div class="v-hint">Paste a link, pick your quality, get one
             ready-to-play file.</div>
         <div class="v-meta">v{vidora.__version__} &nbsp;·&nbsp; © {vidora.__year__}
