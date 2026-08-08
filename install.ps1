@@ -18,6 +18,7 @@
 $ErrorActionPreference = "Stop"
 
 $RepoUrl     = "https://github.com/jay6430/vidora.git"
+$ZipUrl      = "https://github.com/jay6430/vidora/archive/refs/heads/main.zip"
 $RepoDirName = "vidora"
 
 # ---------------------------------------------------------------- appearance
@@ -54,19 +55,51 @@ if ($PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "vidora.py"))) {
 }
 
 if (-not $dir) {
-    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-        Write-Fail "git is required to download Vidora.`n          Install it with:  winget install Git.Git"
-    }
-
     $target = Join-Path (Get-Location) $RepoDirName
-    if (Test-Path (Join-Path $target ".git")) {
-        Write-Step "Updating existing copy in $target"
-        git -C $target pull --ff-only --quiet 2>$null
-    } else {
+
+    if (Test-Path (Join-Path $target "vidora.py")) {
+        # Already downloaded before. Update it if git is available, otherwise
+        # just use what is there.
+        if ((Test-Path (Join-Path $target ".git")) -and
+            (Get-Command git -ErrorAction SilentlyContinue)) {
+            Write-Step "Updating existing copy in $target"
+            git -C $target pull --ff-only --quiet 2>$null
+        } else {
+            Write-Step "Using existing copy in $target"
+        }
+    }
+    elseif (Get-Command git -ErrorAction SilentlyContinue) {
         Write-Step "Downloading Vidora into $target"
         git clone --quiet --depth 1 $RepoUrl $target 2>$null
         if ($LASTEXITCODE -ne 0) { Write-Fail "Could not download Vidora from $RepoUrl" }
     }
+    else {
+        # No git, and no need for it - fetch the ZIP that GitHub publishes.
+        # Windows has had Expand-Archive built in since PowerShell 5.
+        Write-Step "Downloading Vidora (no git needed)..."
+        $zip = Join-Path $env:TEMP "vidora-main.zip"
+        $tmp = Join-Path $env:TEMP "vidora-extract"
+
+        try {
+            Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
+            $ProgressPreference = "SilentlyContinue"   # the bar slows this hugely
+            Invoke-WebRequest -Uri $ZipUrl -OutFile $zip -UseBasicParsing
+            Expand-Archive -Path $zip -DestinationPath $tmp -Force
+        } catch {
+            Write-Fail "Could not download Vidora.`n          Check your internet connection, then try again.`n          $($_.Exception.Message)"
+        }
+
+        $extracted = Join-Path $tmp "vidora-main"
+        if (-not (Test-Path (Join-Path $extracted "vidora.py"))) {
+            Write-Fail "The download did not contain what was expected. Please try again."
+        }
+
+        New-Item -ItemType Directory -Force -Path $target | Out-Null
+        Copy-Item -Path (Join-Path $extracted "*") -Destination $target -Recurse -Force
+        Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Good "Downloaded"
+    }
+
     $dir = $target
 }
 

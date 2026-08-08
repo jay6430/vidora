@@ -17,6 +17,7 @@
 set -euo pipefail
 
 REPO_URL="https://github.com/jay6430/vidora.git"
+TARBALL_URL="https://github.com/jay6430/vidora/archive/refs/heads/main.tar.gz"
 REPO_DIR_NAME="vidora"
 
 # ---------------------------------------------------------------- appearance
@@ -59,20 +60,49 @@ fi
 banner
 
 if [ -z "$DIR" ] || [ ! -f "$DIR/vidora.py" ]; then
-    command -v git >/dev/null 2>&1 || fail \
-        "git is required to download Vidora.
-          macOS: xcode-select --install
-          Linux: sudo apt install git"
-
     TARGET="$PWD/$REPO_DIR_NAME"
-    if [ -d "$TARGET/.git" ]; then
-        step "Updating existing copy in $TARGET"
-        git -C "$TARGET" pull --ff-only --quiet || warn "could not update, using what is here"
-    else
+
+    if [ -f "$TARGET/vidora.py" ]; then
+        # Already downloaded before. Update it if this is a git checkout,
+        # otherwise just use what is there.
+        if [ -d "$TARGET/.git" ] && command -v git >/dev/null 2>&1; then
+            step "Updating existing copy in $TARGET"
+            git -C "$TARGET" pull --ff-only --quiet 2>/dev/null \
+                || warn "could not update, using what is here"
+        else
+            step "Using existing copy in $TARGET"
+        fi
+    elif command -v git >/dev/null 2>&1; then
         step "Downloading Vidora into $TARGET"
         git clone --quiet --depth 1 "$REPO_URL" "$TARGET" \
-            || fail "could not download Vidora from $REPO_URL"
+            || fail "Could not download Vidora. Check your internet connection."
+    else
+        # No git, and no need for it - curl and tar are on every Mac and
+        # virtually every Linux, and curl already fetched this script.
+        step "Downloading Vidora into $TARGET (no git needed)"
+
+        command -v tar >/dev/null 2>&1 \
+            || fail "tar is needed to unpack the download but was not found."
+        command -v gzip >/dev/null 2>&1 \
+            || fail "gzip is needed to unpack the download but was not found."
+
+        # Download and unpack as separate steps, so a network problem and a
+        # broken archive do not produce the same misleading message.
+        TMP_TGZ="${TMPDIR:-/tmp}/vidora-main.$$.tar.gz"
+        curl -fsSL -o "$TMP_TGZ" "$TARBALL_URL" \
+            || fail "Could not download Vidora. Check your internet connection."
+
+        mkdir -p "$TARGET"
+        if ! tar -xzf "$TMP_TGZ" -C "$TARGET" --strip-components=1 2>/dev/null; then
+            rm -f "$TMP_TGZ"
+            fail "The download could not be unpacked. Please try again."
+        fi
+        rm -f "$TMP_TGZ"
+
+        [ -f "$TARGET/vidora.py" ] \
+            || fail "The download did not contain what was expected. Please try again."
     fi
+
     DIR="$TARGET"
 fi
 
