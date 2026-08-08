@@ -415,12 +415,29 @@ def postprocessor_hook(d: dict) -> None:
 # ==========================================================================
 
 def default_outdir() -> Path:
+    """Where finished files land. Downloads is where people look first."""
     env = os.environ.get("VIDORA_OUT") or os.environ.get("YTDL_OUT")
     if env:
         return Path(env).expanduser()
-    home = Path.home()
-    base = home / "Movies" if (home / "Movies").exists() else home / "Videos"
-    return base / "Vidora"
+    downloads = Path.home() / "Downloads"
+    return downloads if downloads.exists() else Path.home()
+
+
+def open_folder(path) -> bool:
+    """Reveal a folder in the system file manager. True if it worked."""
+    import subprocess
+
+    path = str(path)
+    try:
+        if sys.platform == "darwin":
+            subprocess.run(["open", path], check=True)
+        elif sys.platform.startswith("win"):
+            os.startfile(path)  # noqa: S606 - Windows-only, path is ours
+        else:
+            subprocess.run(["xdg-open", path], check=True)
+        return True
+    except Exception:
+        return False
 
 
 def build_opts(args, outdir: Path, selection: dict | None, ffmpeg: str | None = None):
@@ -472,7 +489,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("url", nargs="?", help="video URL (quote it in zsh)")
     p.add_argument("-o", "--out", metavar="DIR",
-                   help="output folder (default: ~/Movies/Vidora or ~/Videos/Vidora)")
+                   help="output folder (default: your Downloads folder)")
     p.add_argument("--best", action="store_true",
                    help="skip the menu, take the highest resolution")
     p.add_argument("--max", type=int, metavar="HEIGHT",

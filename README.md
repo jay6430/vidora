@@ -55,13 +55,13 @@ computer rather than someone's server.
 
    Which one? [1-6, Enter = 1] 3
 
-  · saving to /Users/jay/Movies/Vidora
+  · saving to /Users/jay/Downloads
 
    video ████████████████░░░░░░░░  67%     8.4 MB/s   eta 0:14
    audio ████████████████████████ 100%    11.2 MB/s   eta 0:00
   · merging video and audio (ffmpeg)
 
-  Done  /Users/jay/Movies/Vidora
+  Done  /Users/jay/Downloads
 ```
 
 Sizes include the audio track, so the number shown is roughly what lands on
@@ -70,43 +70,60 @@ out as an MP4.
 
 ---
 
-## Setup
+## Setup — one line
 
-Three things: Python 3.8+, yt-dlp, ffmpeg.
+Copy the line for your system, paste it into a terminal, press Enter. It
+installs everything into a self-contained folder and opens Vidora in your
+browser.
 
-**macOS**
+**macOS** — press `⌘ Space`, type **Terminal**, press Enter, then paste:
 
 ```bash
-brew install python ffmpeg
-python3 -m pip install -r requirements.txt
+curl -fsSL https://raw.githubusercontent.com/jay6430/vidora/main/install.sh | bash
 ```
 
-**Windows** (PowerShell)
+**Windows** — click Start, type **PowerShell**, open it, then paste:
 
 ```powershell
-winget install Python.Python.3.12
-winget install Gyan.FFmpeg
-python -m pip install -r requirements.txt
+irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex
 ```
 
-Reopen PowerShell afterwards so the new PATH takes effect.
+If Windows says running scripts is disabled, run
+`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` first.
 
-**Linux** (Debian/Ubuntu)
+**Linux** — press `Ctrl Alt T`, then paste:
 
 ```bash
-sudo apt install python3 python3-pip ffmpeg
-python3 -m pip install -r requirements.txt
+curl -fsSL https://raw.githubusercontent.com/jay6430/vidora/main/install.sh | bash
 ```
 
-**No system install possible?** ffmpeg also ships inside a Python package, and
-Vidora will find it there automatically:
+Run the same line again any time to reopen Vidora. It detects what is already
+installed and skips straight to launching.
+
+### What the installer does
+
+Nothing hidden, and nothing outside the project folder:
+
+1. Checks for Python 3.8+ and stops with instructions if it is missing
+2. Installs ffmpeg via Homebrew, apt or winget — or falls back to a
+   pip-packaged build that needs no admin rights
+3. Creates a `.venv` inside the project folder
+4. Installs yt-dlp and Streamlit into that venv only
+5. Verifies both imports and that ffmpeg is reachable
+6. Launches the web UI
+
+It never installs anything system-wide except ffmpeg, and never touches your
+global Python packages.
+
+**Prefer to inspect before running?** Reasonable — piping a script from the
+internet into your shell is worth being careful about:
 
 ```bash
-python3 -m pip install imageio-ffmpeg
+git clone https://github.com/jay6430/vidora.git
+cd vidora
+less install.sh      # read it
+./install.sh
 ```
-
-Vidora checks for both dependencies on startup and names whichever is missing,
-so nothing fails halfway through a download.
 
 ---
 
@@ -135,8 +152,8 @@ a glob and you get `zsh: no matches found`.
 | `--no-banner` | Skip the header, for scripting |
 | `-V`, `--version` | Print version and author |
 
-Downloads land in `~/Movies/Vidora` on macOS and `~/Videos/Vidora` elsewhere.
-Set `VIDORA_OUT` to change that permanently.
+Downloads land in your **Downloads** folder. Set `VIDORA_OUT` to change that
+permanently, or use `-o` for a one-off.
 
 ### One-word command
 
@@ -160,20 +177,24 @@ command works from any directory without activating anything first.
 
 ## The web UI
 
-If you would rather click than type, Vidora ships a local interface built on
-Streamlit:
+The installer opens this automatically. To start it yourself:
 
 ```bash
-streamlit run vidora_ui.py
+python3 -m streamlit run vidora_ui.py
 ```
 
-It opens in your browser at `localhost:8501` with a thumbnail, a resolution
-picker, live progress, and the same engine underneath — the CLI and the UI both
-call the same functions in `vidora.py`, so they can never disagree about what
-they will download.
+Use `python3 -m` rather than a bare `streamlit` — that guarantees it runs on
+the same interpreter as your virtualenv. A bare `streamlit` may resolve to a
+global install with no yt-dlp, which produces a confusing failure.
 
-Nothing leaves your machine. The page is served from your own computer and
-files are written straight to the folder you choose.
+It opens at `localhost:8501` with a thumbnail, a quality picker, live progress
+and an **Open folder** button when the download finishes. The highest-quality
+MP4 is preselected, since MP4 plays on anything; the larger MKV options are
+there if you want them. Everything else — save location, subtitles, smaller
+AV1/VP9 files — sits under **More options**.
+
+The CLI and the UI call the same functions in `vidora.py`, so they can never
+disagree about what they will download. Nothing leaves your machine.
 
 ---
 
@@ -216,6 +237,8 @@ marked H.264. Vidora already prefers H.264 at each resolution for this reason;
 vidora/
 ├── vidora.py           the tool
 ├── vidora_ui.py        local web UI (Streamlit)
+├── install.sh          one-command setup + launcher (macOS / Linux)
+├── install.ps1         one-command setup + launcher (Windows)
 ├── vidora              launcher — macOS / Linux
 ├── vidora.bat          launcher — Windows (cmd)
 ├── vidora.ps1          launcher — Windows (PowerShell)

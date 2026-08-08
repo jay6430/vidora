@@ -217,6 +217,40 @@ section { padding: 74px 0; }
 }
 .copy:hover { color: var(--accent); border-color: var(--accent-2); }
 
+/* ---------------- numbered steps ---------------- */
+.steps { display: flex; flex-direction: column; gap: 14px; }
+.step { display: flex; gap: 16px; align-items: flex-start; }
+.step .n {
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface-2); border: 1px solid var(--line);
+  color: var(--accent); font-size: .84rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 2px;
+}
+.step .s { flex: 1; min-width: 0; }
+.step h4 { font-size: .98rem; font-weight: 600; margin-bottom: 6px; }
+.step p { font-size: .87rem; color: var(--muted); font-weight: 300; margin-top: 8px; }
+.step .code { margin-top: 4px; padding: 16px 76px 16px 18px; }
+
+/* The install command must wrap rather than scroll - people need to see all
+   of it before they trust pasting it. */
+.oneline { white-space: pre-wrap; word-break: break-all; color: var(--accent); }
+
+kbd {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-bottom-width: 2px; border-radius: 5px;
+  padding: 1px 6px; font-size: .8em; font-family: 'Inter', sans-serif;
+  color: var(--text);
+}
+
+.reopen {
+  margin-top: 26px; padding: 16px 20px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.reopen b { font-size: .9rem; }
+.reopen p { font-size: .86rem; color: var(--muted); font-weight: 300; margin-top: 4px; }
+
 .hidden { display: none; }
 
 /* ---------------- note ---------------- */
@@ -305,9 +339,9 @@ footer a:hover { color: var(--accent); }
         <ul>
           <li>Every quality has sound</li>
           <li>Up to 4K</li>
-          <li>Paste, pick, done</li>
+          <li>Paste the link, pick, done</li>
+          <li>Saves straight to Downloads</li>
           <li>No ads, ever</li>
-          <li>Runs on your own computer</li>
         </ul>
       </div>
     </div>
@@ -356,16 +390,17 @@ footer a:hover { color: var(--accent); }
       </div>
       <div class="card">
         <div class="ico">⌘</div>
-        <h3>Terminal or browser</h3>
-        <p>Type one command, or open the visual picker in your browser. Works the same on macOS, Windows and Linux.</p>
+        <h3>One line to set up</h3>
+        <p>Paste a single line and it installs everything, then opens in your browser. Same on macOS, Windows and Linux.</p>
       </div>
     </div>
   </section>
 
   <section id="install">
     <div class="sec-head rv">
-      <h2>Set up once, use forever</h2>
-      <p>Three copy-paste commands. No account, no subscription, no upload limits.</p>
+      <h2>Set up in one step</h2>
+      <p>Copy one line, paste it, press Enter. It installs everything for you
+         and opens Vidora in your browser. No account, no subscription, no limits.</p>
     </div>
 
     <div class="tabs rv">
@@ -374,51 +409,95 @@ footer a:hover { color: var(--accent); }
       <div class="tab" data-os="linux">Linux</div>
     </div>
 
-    <div class="code rv" id="code-mac">
-      <button class="copy" data-t="mac">Copy</button><span class="cm"># install the dependencies</span>
-<span class="p">$</span> brew install python ffmpeg
+    <div class="steps rv" id="steps-mac">
+      <div class="step">
+        <div class="n">1</div>
+        <div class="s">
+          <h4>Open Terminal</h4>
+          <p>Press <kbd>⌘</kbd> <kbd>Space</kbd>, type <b>Terminal</b>, press Enter.
+             A window with text appears — that is all it is.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div class="s">
+          <h4>Paste this line and press Enter</h4>
+          <div class="code"><button class="copy" data-t="mac">Copy</button><span class="oneline">curl -fsSL https://raw.githubusercontent.com/jay6430/vidora/main/install.sh | bash</span></div>
+          <p>Right-click to paste, or press <kbd>⌘</kbd> <kbd>V</kbd>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div class="s">
+          <h4>Wait, then use it</h4>
+          <p>It installs what it needs and opens Vidora in your browser.
+             The first time takes a few minutes. After that it opens in seconds.</p>
+        </div>
+      </div>
+    </div>
 
-<span class="cm"># get Vidora</span>
-<span class="p">$</span> git clone https://github.com/jay6430/vidora.git
-<span class="p">$</span> cd vidora
-<span class="p">$</span> pip install -r requirements.txt
+    <div class="steps hidden" id="steps-win">
+      <div class="step">
+        <div class="n">1</div>
+        <div class="s">
+          <h4>Open PowerShell</h4>
+          <p>Click <b>Start</b>, type <b>PowerShell</b>, click <b>Windows PowerShell</b>.
+             A blue window appears — that is the right one.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div class="s">
+          <h4>Paste this line and press Enter</h4>
+          <div class="code"><button class="copy" data-t="win">Copy</button><span class="oneline">irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex</span></div>
+          <p>Right-click pastes in PowerShell. If it says running scripts is
+             disabled, paste
+             <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>
+             first, press Enter, type <b>Y</b>, then try again.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div class="s">
+          <h4>Wait, then use it</h4>
+          <p>It installs what it needs and opens Vidora in your browser.
+             The first time takes a few minutes. After that it opens in seconds.</p>
+        </div>
+      </div>
+    </div>
 
-<span class="cm"># use it</span>
-<span class="p">$</span> python3 vidora.py "URL"
+    <div class="steps hidden" id="steps-linux">
+      <div class="step">
+        <div class="n">1</div>
+        <div class="s">
+          <h4>Open a terminal</h4>
+          <p>Press <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>T</kbd>, or find
+             <b>Terminal</b> in your applications.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div class="s">
+          <h4>Paste this line and press Enter</h4>
+          <div class="code"><button class="copy" data-t="linux">Copy</button><span class="oneline">curl -fsSL https://raw.githubusercontent.com/jay6430/vidora/main/install.sh | bash</span></div>
+          <p>Paste with <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>V</kbd>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div class="s">
+          <h4>Wait, then use it</h4>
+          <p>It installs what it needs and opens Vidora in your browser.
+             The first time takes a few minutes. After that it opens in seconds.</p>
+        </div>
+      </div>
+    </div>
 
-<span class="cm"># or the web UI</span>
-<span class="p">$</span> streamlit run vidora_ui.py</div>
-
-    <div class="code hidden" id="code-win">
-      <button class="copy" data-t="win">Copy</button><span class="cm">:: install the dependencies</span>
-<span class="p">></span> winget install Python.Python.3.12
-<span class="p">></span> winget install Gyan.FFmpeg
-
-<span class="cm">:: get Vidora</span>
-<span class="p">></span> git clone https://github.com/jay6430/vidora.git
-<span class="p">></span> cd vidora
-<span class="p">></span> pip install -r requirements.txt
-
-<span class="cm">:: use it</span>
-<span class="p">></span> vidora.bat "URL"
-
-<span class="cm">:: or the web UI</span>
-<span class="p">></span> streamlit run vidora_ui.py</div>
-
-    <div class="code hidden" id="code-linux">
-      <button class="copy" data-t="linux">Copy</button><span class="cm"># install the dependencies</span>
-<span class="p">$</span> sudo apt install python3 python3-pip ffmpeg
-
-<span class="cm"># get Vidora</span>
-<span class="p">$</span> git clone https://github.com/jay6430/vidora.git
-<span class="p">$</span> cd vidora
-<span class="p">$</span> pip install -r requirements.txt
-
-<span class="cm"># use it</span>
-<span class="p">$</span> ./vidora "URL"
-
-<span class="cm"># or the web UI</span>
-<span class="p">$</span> streamlit run vidora_ui.py</div>
+    <div class="reopen rv">
+      <b>Opening it again later</b>
+      <p>Run the same line any time — it remembers what is already installed
+         and just opens Vidora. Nothing gets installed twice.</p>
+    </div>
 
     <div class="note rv">
       <b>It runs on your computer, not a website.</b> That is why there are no
@@ -466,17 +545,16 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
     tab.classList.add('on');
     ['mac', 'win', 'linux'].forEach(os =>
-      document.getElementById('code-' + os).classList.toggle('hidden', os !== tab.dataset.os));
+      document.getElementById('steps-' + os).classList.toggle('hidden', os !== tab.dataset.os));
   };
 });
 
 /* ---- copy buttons ---- */
 document.querySelectorAll('.copy').forEach(btn => {
   btn.onclick = () => {
-    const block = document.getElementById('code-' + btn.dataset.t);
-    const text = block.innerText.replace(/^Copy\n/, '')
-      .split('\n').map(l => l.replace(/^[$>]\s?/, '')).join('\n');
-    navigator.clipboard.writeText(text).then(() => {
+    // Copy exactly the command, never the button label or any stray whitespace.
+    const cmd = btn.parentElement.querySelector('.oneline').textContent.trim();
+    navigator.clipboard.writeText(cmd).then(() => {
       btn.textContent = 'Copied';
       setTimeout(() => btn.textContent = 'Copy', 1600);
     });
@@ -508,13 +586,13 @@ const LINES = [
   { t: '', d: 60 },
   { t: '   <span class="c-wht">Which one?</span> <span class="c-dim">[1-5, Enter = 1]</span> <span class="c-acc">3</span>', d: 560 },
   { t: '', d: 90 },
-  { t: '<span class="c-dim">  ·</span> saving to <span class="c-acc">~/Movies/Vidora</span>', d: 300 },
+  { t: '<span class="c-dim">  ·</span> saving to <span class="c-acc">~/Downloads</span>', d: 300 },
   { t: '', d: 60 },
   { t: '   <span class="c-dim">video</span> <span class="c-acc">████████████████░░░░░░░░</span>  67%     8.4 MB/s   <span class="c-dim">eta 0:14</span>', d: 460 },
   { t: '   <span class="c-dim">audio</span> <span class="c-acc">████████████████████████</span> 100%    11.2 MB/s   <span class="c-dim">eta 0:00</span>', d: 300 },
   { t: '<span class="c-dim">  ·</span> merging video and audio <span class="c-dim">(ffmpeg)</span>', d: 640 },
   { t: '', d: 60 },
-  { t: '  <span class="c-grn">Done</span>  <span class="c-dim">~/Movies/Vidora</span>', d: 60 },
+  { t: '  <span class="c-grn">Done</span>  <span class="c-dim">~/Downloads</span>', d: 60 },
   { t: '  <span class="c-vio">Thanks to Ishan Mistry, whose idea set Vidora in motion.</span>', d: 2600 }
 ];
 
