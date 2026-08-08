@@ -203,6 +203,8 @@ section { padding: 74px 0; }
   padding: 20px 22px; font-family: 'JetBrains Mono', monospace;
   font-size: .82rem; line-height: 1.95; color: #cfd4dc;
   position: relative; overflow-x: auto;
+  /* Without this the newlines collapse and every command runs together. */
+  white-space: pre;
 }
 .code .p { color: var(--accent); user-select: none; }
 .code .cm { color: var(--faint); }
