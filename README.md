@@ -85,11 +85,12 @@ curl -fsSL https://raw.githubusercontent.com/jay6430/vidora/main/install.sh | ba
 **Windows** — click Start, type **PowerShell**, open it, then paste:
 
 ```powershell
-irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force; irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex
 ```
 
-If Windows says running scripts is disabled, run
-`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` first.
+The first half grants permission to run the installer for your user account
+only. It is bundled into the same line so nobody hits a permissions error part
+way through.
 
 **Linux** — press `Ctrl Alt T`, then paste:
 

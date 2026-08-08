@@ -77,6 +77,11 @@ html, body, [class*="css"] {
     background-clip: text; margin-bottom: .3rem; line-height: 1;
 }
 .v-tag {color: var(--text); font-size: 1.01rem; font-weight: 500; letter-spacing: -.01em;}
+.v-tag .yt {
+    color: var(--accent); font-weight: 600;
+    border-bottom: 1.5px solid rgba(94,234,212,.35);
+    padding-bottom: 1px;
+}
 .v-hint {color: var(--muted); font-size: .86rem; font-weight: 300; margin-top: .25rem;}
 
 /* ---------- inputs ---------- */
@@ -317,7 +322,8 @@ st.markdown(
     f"""
     <div class="v-head">
         <div class="v-mark">Vidora</div>
-        <div class="v-tag">Download videos in HD — with the sound included.</div>
+        <div class="v-tag">Download <span class="yt">YouTube</span> videos in HD
+            — with the sound included.</div>
         <div class="v-hint">Paste a link, pick your quality, get one
             ready-to-play file.</div>
     </div>
@@ -363,7 +369,7 @@ if not vidora.find_ffmpeg():
 
 url = st.text_input(
     "Video URL",
-    placeholder="Paste a video link here",
+    placeholder="Paste YouTube video link here  (example: https://youtu.be/…)",
     label_visibility="collapsed",
 )
 
@@ -389,19 +395,46 @@ with st.expander("More options"):
 
 outdir_str = st.session_state.get("outdir", default_dir)
 
-if url and not URL_PATTERN.match(url.strip()):
+# Nothing happens until this is clicked, so a half-typed or half-pasted link
+# never triggers a lookup.
+already_loaded = bool(st.session_state.get("active_url"))
+fetch_clicked = st.button(
+    "Fetch video", type="secondary" if already_loaded else "primary"
+)
+
+if fetch_clicked:
+    candidate = url.strip()
+    if not candidate:
+        st.session_state["url_error"] = "Paste a link first, then press Fetch video."
+        st.session_state.pop("active_url", None)
+    elif not URL_PATTERN.match(candidate):
+        st.session_state["url_error"] = (
+            "That does not look like a link. It should start with "
+            "<code>https://</code> — for example "
+            "<code>https://youtu.be/dQw4w9WgXcQ</code>."
+        )
+        st.session_state.pop("active_url", None)
+    else:
+        st.session_state.pop("url_error", None)
+        st.session_state["active_url"] = candidate
+        # A new video means the previous result is no longer relevant.
+        st.session_state.pop("last_file", None)
+        st.session_state.pop("last_dir", None)
+
+if st.session_state.get("url_error"):
     st.markdown(
-        "<div class='v-warn'>That does not look like a link. It should start "
-        "with <code>https://</code>.</div>",
+        f"<div class='v-warn'>{st.session_state['url_error']}</div>",
         unsafe_allow_html=True,
     )
-    url = ""
 
 # --------------------------------------------------------------------------
 # quality picker
 # --------------------------------------------------------------------------
 
-if url:
+active_url = st.session_state.get("active_url")
+
+if active_url:
+    url = active_url
     try:
         with st.spinner("Checking available qualities…"):
             meta = fetch_meta(url.strip())

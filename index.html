@@ -449,11 +449,10 @@ footer a:hover { color: var(--accent); }
         <div class="n">2</div>
         <div class="s">
           <h4>Paste this line and press Enter</h4>
-          <div class="code"><button class="copy" data-t="win">Copy</button><span class="oneline">irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex</span></div>
-          <p>Right-click pastes in PowerShell. If it says running scripts is
-             disabled, paste
-             <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>
-             first, press Enter, type <b>Y</b>, then try again.</p>
+          <div class="code"><button class="copy" data-t="win">Copy</button><span class="oneline">Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force; irm https://raw.githubusercontent.com/jay6430/vidora/main/install.ps1 | iex</span></div>
+          <p>Right-click pastes in PowerShell. The first half of that line is
+             Windows' permission to run the installer — it is included so you
+             will not hit an error part way through.</p>
         </div>
       </div>
       <div class="step">
@@ -540,14 +539,35 @@ const io = new IntersectionObserver(es => {
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
 /* ---- install tabs ---- */
+function selectOS(os) {
+  document.querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('on', t.dataset.os === os));
+  ['mac', 'win', 'linux'].forEach(name =>
+    document.getElementById('steps-' + name).classList.toggle('hidden', name !== os));
+}
+
 document.querySelectorAll('.tab').forEach(tab => {
-  tab.onclick = () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-    tab.classList.add('on');
-    ['mac', 'win', 'linux'].forEach(os =>
-      document.getElementById('steps-' + os).classList.toggle('hidden', os !== tab.dataset.os));
-  };
+  tab.onclick = () => selectOS(tab.dataset.os);
 });
+
+/* Show the visitor their own system first, so the instructions they see are
+   the ones they need. userAgentData is the modern API; userAgent is the
+   fallback that still works everywhere. */
+function detectOS() {
+  const hint = (navigator.userAgentData && navigator.userAgentData.platform) || '';
+  const ua = navigator.userAgent || '';
+  const both = (hint + ' ' + ua).toLowerCase();
+
+  // Check iOS/Android first - they contain "mac"/"linux" substrings.
+  if (/iphone|ipad|ipod|android/.test(both)) return null;
+  if (/win/.test(both)) return 'win';
+  if (/mac/.test(both)) return 'mac';
+  if (/linux|x11|cros/.test(both)) return 'linux';
+  return null;
+}
+
+const detected = detectOS();
+if (detected) selectOS(detected);
 
 /* ---- copy buttons ---- */
 document.querySelectorAll('.copy').forEach(btn => {

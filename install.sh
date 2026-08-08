@@ -40,7 +40,8 @@ banner() {
     printf "  %s│%s  %s%sVIDORA%s %s·  HD video downloads, with the sound included%s   %s│%s\n" \
         "$DIM" "$OFF" "$BOLD" "$ACC" "$OFF" "$DIM" "$OFF" "$DIM" "$OFF"
     printf "  %s╰──────────────────────────────────────────────────────────╯%s\n" "$DIM" "$OFF"
-    printf "  %s                     © 2026 Jay Kadam   ·   MIT setup%s\n\n" "$DIM" "$OFF"
+    printf "  %s                     © 2026 Jay Kadam   ·   MIT setup%s\n" "$DIM" "$OFF"
+    printf "  %s  Thanks to Ishan Mistry, whose idea set Vidora in motion.%s\n\n" "$DIM" "$OFF"
 }
 
 # ---------------------------------------------------------------- platform

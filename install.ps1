@@ -42,6 +42,7 @@ function Show-Banner {
     Write-Host "  -  HD video downloads, with the sound included  |" -ForegroundColor DarkGray
     Write-Host "  +----------------------------------------------------------+" -ForegroundColor DarkGray
     Write-Host "                        (c) 2026 Jay Kadam  -  MIT setup" -ForegroundColor DarkGray
+    Write-Host "    Thanks to Ishan Mistry, whose idea set Vidora in motion." -ForegroundColor DarkGray
     Write-Host ""
 }
 
