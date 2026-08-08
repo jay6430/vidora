@@ -2,7 +2,9 @@
 
 # Vidora
 
-**Video and audio, one finished file.**
+**HD video downloader — with the sound included.**
+
+Paste a YouTube link, pick your quality up to 4K, get one ready-to-play file.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
@@ -15,21 +17,26 @@
 
 ---
 
-## The problem
+## What it does
 
-Anything above 360p is delivered as two separate streams — video with no sound,
-and audio with no picture. That is why the download sites hand you either a
-silent 1080p file or a 360p one with audio, and why the usual workaround is to
-download both halves and merge them by hand.
+Download a video in **4K, 1440p, 1080p or 720p** and actually get the audio
+with it. Choose **MP4 or MKV**, grab the **audio on its own**, pull in
+**subtitles**, or queue a **whole playlist**.
 
-Vidora does that last step for you. It reads the resolutions actually on offer,
-lets you pick one, downloads both streams and muxes them into a single file.
+Most download sites give you a silent file above 360p. That is because anything
+higher is delivered as two separate streams — video with no sound, audio with
+no picture — and they hand you only the first. Vidora fetches both and merges
+them, so every quality on the list comes out ready to play.
+
+Works with YouTube and the many other sites [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+supports. Free, open source, no ads, no upload limits, and it runs on your own
+computer rather than someone's server.
 
 ```
-  ╭─────────────────────────────────────────────────╮
-  │  VIDORA ·  video and audio, one finished file   │
-  ╰─────────────────────────────────────────────────╯
-              v1.0.0   ·   © 2026 Jay Kadam   ·   MIT
+  ╭──────────────────────────────────────────────────────────╮
+  │  VIDORA ·  HD video downloads, with the sound included   │
+  ╰──────────────────────────────────────────────────────────╯
+                       v1.0.0   ·   © 2026 Jay Kadam   ·   MIT
 
   · reading available formats ...
 

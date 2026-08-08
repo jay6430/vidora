@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-Vidora - download video at full resolution, with the audio already in it.
+Vidora - an HD YouTube video downloader that keeps the audio.
 
-Anything above 360p is served as separate video-only and audio-only streams,
-which is why most download sites hand back a silent file. Vidora lists the
-resolutions actually on offer, lets you pick one, and muxes the two streams
-into a single finished file in one step.
+Paste a link, pick a quality up to 4K, and get one ready-to-play file. Most
+downloaders cap you at 360p if you want sound, because above that the video
+and audio are delivered as separate streams. Vidora fetches both and merges
+them for you, so nothing arrives silent.
+
+Also handles audio-only downloads, subtitles, playlists, and any other site
+yt-dlp supports.
 
 Author:   Jay Kadam <kadamjay100@gmail.com>
 License:  MIT - see LICENSE
@@ -30,7 +33,7 @@ __email__ = "kadamjay100@gmail.com"
 __license__ = "MIT"
 __year__ = "2026"
 __copyright__ = f"Copyright (c) {__year__} {__author__}"
-__tagline__ = "video and audio, one finished file"
+__tagline__ = "HD video downloads, with the sound included"
 __thanks__ = "Thanks to Ishan Mistry, whose idea set Vidora in motion."
 
 
@@ -463,7 +466,8 @@ def build_opts(args, outdir: Path, selection: dict | None, ffmpeg: str | None = 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="vidora",
-        description=f"{__app__} - {__tagline__}.",
+        description=f"{__app__} - HD video downloads with the sound included. "
+                    f"Pick any quality up to 4K and get one ready-to-play file.",
         epilog=f"{__thanks__}\n{__copyright__}. MIT licensed.",
     )
     p.add_argument("url", nargs="?", help="video URL (quote it in zsh)")

@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vidora — video and audio, one finished file</title>
-<meta name="description" content="Vidora downloads video at full resolution with the audio already merged. A cross-platform command line tool and local web UI by Jay Kadam.">
+<title>Vidora — HD YouTube Video Downloader, with Audio</title>
+<meta name="description" content="Download YouTube videos in HD with the sound included. Pick any quality up to 4K, choose MP4 or MKV, grab audio-only or subtitles. Free, open source, and runs on your own machine — macOS, Windows and Linux.">
 <meta name="author" content="Jay Kadam">
+<meta name="keywords" content="youtube video downloader, hd video downloader, 4k video downloader, download youtube with audio, mp4 downloader, youtube to mp3, free video downloader">
 
-<meta property="og:title" content="Vidora — video and audio, one finished file">
-<meta property="og:description" content="Full resolution, audio already merged. One command instead of download, download, merge.">
+<meta property="og:title" content="Vidora — HD YouTube Video Downloader, with Audio">
+<meta property="og:description" content="Download YouTube videos in HD with the sound included. Any quality up to 4K, MP4 or MKV, audio-only and subtitles. Free and open source.">
 <meta property="og:type" content="website">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
@@ -272,14 +273,14 @@ footer a:hover { color: var(--accent); }
 <div class="wrap">
 
   <header>
-    <div class="pill">◈ <b>v1.0.0</b> · macOS, Windows, Linux</div>
-    <h1>Video and audio,<br>one finished file.</h1>
+    <div class="pill">◈ <b>Free &amp; open source</b> · macOS, Windows, Linux</div>
+    <h1>Download videos in HD.<br>With the sound.</h1>
     <p class="lede">
-      Above 360p, video and audio arrive as <b>separate streams</b>.
-      That is why you get a silent 1080p file, or a 360p one with sound.
-      Vidora merges them for you.
+      Paste a YouTube link, pick your quality — <b>4K, 1440p, 1080p, 720p</b> —
+      and get one ready-to-play file. No silent videos. No separate audio track.
+      No merging it yourself.
     </p>
-    <p class="byline">A command line tool and local web UI by Jay Kadam</p>
+    <p class="byline">A free desktop tool by Jay Kadam</p>
     <div class="cta">
       <a href="#install" class="btn btn-primary">Get started</a>
       <a href="https://github.com/jay6430/vidora" class="btn btn-ghost">View source</a>
@@ -289,22 +290,24 @@ footer a:hover { color: var(--accent); }
   <div class="problem rv">
     <div class="problem-grid">
       <div class="pcard bad">
-        <h4>The usual routine</h4>
+        <h4>Those download sites</h4>
         <ul>
-          <li>Download the silent video</li>
+          <li>1080p and 4K come out silent</li>
+          <li>Only 360p has sound</li>
           <li>Download the audio separately</li>
-          <li>Find a merging tool</li>
-          <li>Work out the ffmpeg flags</li>
-          <li>Repeat for every video</li>
+          <li>Hunt for a tool to merge them</li>
+          <li>Ads, popups and fake buttons</li>
         </ul>
       </div>
       <div class="arrow">→</div>
       <div class="pcard good">
-        <h4>With Vidora</h4>
+        <h4>Vidora</h4>
         <ul>
-          <li>Paste the URL</li>
-          <li>Pick a resolution</li>
-          <li>Done</li>
+          <li>Every quality has sound</li>
+          <li>Up to 4K</li>
+          <li>Paste, pick, done</li>
+          <li>No ads, ever</li>
+          <li>Runs on your own computer</li>
         </ul>
       </div>
     </div>
@@ -322,47 +325,47 @@ footer a:hover { color: var(--accent); }
 
   <section>
     <div class="sec-head rv">
-      <h2>Considered choices, not just downloads</h2>
-      <p>The details that turn a script into something you keep reaching for.</p>
+      <h2>Everything you'd actually want</h2>
+      <p>Pick the quality, pick the format, or just take the best available.</p>
     </div>
     <div class="grid rv">
       <div class="card">
         <div class="ico">◈</div>
-        <h3>Real resolutions only</h3>
-        <p>Reads what the site actually offers and lists one row per resolution — no invented options, no dead links.</p>
+        <h3>Up to 4K, always with sound</h3>
+        <p>2160p, 1440p, 1080p, 720p, 480p — whatever the video actually has. Every option comes out with the audio already in it.</p>
       </div>
       <div class="card">
         <div class="ico">⇄</div>
-        <h3>MP4 wherever possible</h3>
-        <p>Prefers H.264 at each resolution so files play everywhere. Falls back to MKV only when the codec demands it, and says so.</p>
+        <h3>MP4 or MKV, your choice</h3>
+        <p>Defaults to MP4 so files play on any phone, TV or editor. Force either format when you need to.</p>
+      </div>
+      <div class="card">
+        <div class="ico">♪</div>
+        <h3>Audio-only downloads</h3>
+        <p>Just want the track? One flag gives you the audio on its own as an M4A, no video attached.</p>
       </div>
       <div class="card">
         <div class="ico">◷</div>
-        <h3>Honest size estimates</h3>
-        <p>Sizes include the audio track, so the number on screen is roughly what lands on disk.</p>
+        <h3>See the size before you commit</h3>
+        <p>Each quality shows what it will cost you in megabytes, audio included — so 4K never surprises you.</p>
+      </div>
+      <div class="card">
+        <div class="ico">☰</div>
+        <h3>Subtitles and playlists</h3>
+        <p>Burn in English subtitles when a video has them, or queue an entire playlist in one go.</p>
       </div>
       <div class="card">
         <div class="ico">⌘</div>
-        <h3>One file, three platforms</h3>
-        <p>A single Python script with launchers for macOS, Linux, Windows cmd and PowerShell. Nothing to compile.</p>
-      </div>
-      <div class="card">
-        <div class="ico">◨</div>
         <h3>Terminal or browser</h3>
-        <p>Use the CLI, or run the local web UI for a visual picker. Same engine underneath.</p>
-      </div>
-      <div class="card">
-        <div class="ico">⚑</div>
-        <h3>Fails early, not midway</h3>
-        <p>Checks for yt-dlp and ffmpeg on startup and names whatever is missing, with the exact install command.</p>
+        <p>Type one command, or open the visual picker in your browser. Works the same on macOS, Windows and Linux.</p>
       </div>
     </div>
   </section>
 
   <section id="install">
     <div class="sec-head rv">
-      <h2>Up and running in a minute</h2>
-      <p>Python 3.8 or newer, plus two dependencies.</p>
+      <h2>Set up once, use forever</h2>
+      <p>Three copy-paste commands. No account, no subscription, no upload limits.</p>
     </div>
 
     <div class="tabs rv">
@@ -418,10 +421,11 @@ footer a:hover { color: var(--accent); }
 <span class="p">$</span> streamlit run vidora_ui.py</div>
 
     <div class="note rv">
-      <b>Runs on your machine, by design.</b> Vidora is not a hosted service and
-      there is no public instance. Downloading generally runs against a site's
-      terms of service, so please use it for your own uploads, Creative Commons
-      material, or content you have permission for.
+      <b>It runs on your computer, not a website.</b> That is why there are no
+      ads, no queues and no file size caps — but it also means you install it
+      once rather than visiting a page. Downloading generally runs against a
+      site's terms of service, so please use it for your own uploads, Creative
+      Commons material, or content you have permission for.
     </div>
   </section>
 
@@ -483,10 +487,10 @@ document.querySelectorAll('.copy').forEach(btn => {
 const LINES = [
   { t: '<span class="c-acc">$</span> vidora "https://…"', d: 340 },
   { t: '', d: 90 },
-  { t: '<span class="c-dim">  ╭─────────────────────────────────────────────────╮</span>', d: 26 },
-  { t: '<span class="c-dim">  │</span>  <span class="c-acc">VIDORA</span> <span class="c-dim">·  video and audio, one finished file</span>   <span class="c-dim">│</span>', d: 26 },
-  { t: '<span class="c-dim">  ╰─────────────────────────────────────────────────╯</span>', d: 26 },
-  { t: '<span class="c-dim">              v1.0.0   ·   © 2026 Jay Kadam   ·   MIT</span>', d: 240 },
+  { t: '<span class="c-dim">  ╭──────────────────────────────────────────────────────────╮</span>', d: 26 },
+  { t: '<span class="c-dim">  │</span>  <span class="c-acc">VIDORA</span> <span class="c-dim">·  HD video downloads, with the sound included</span>   <span class="c-dim">│</span>', d: 26 },
+  { t: '<span class="c-dim">  ╰──────────────────────────────────────────────────────────╯</span>', d: 26 },
+  { t: '<span class="c-dim">                     v1.0.0   ·   © 2026 Jay Kadam   ·   MIT</span>', d: 240 },
   { t: '', d: 90 },
   { t: '<span class="c-dim">  ·</span> reading available formats …', d: 520 },
   { t: '', d: 90 },

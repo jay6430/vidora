@@ -1,7 +1,8 @@
 """
-Vidora UI - a local web interface for Vidora.
+Vidora UI - an HD video downloader in your browser, running locally.
 
-Runs on your own machine, on your own connection. Start it with:
+Paste a link, pick a quality up to 4K, and get one ready-to-play file with the
+sound already in it. Runs on your own machine, on your own connection:
 
     streamlit run vidora_ui.py
 
@@ -73,7 +74,8 @@ html, body, [class*="css"] {
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text; margin-bottom: .35rem; line-height: 1;
 }
-.v-tag {color: var(--muted); font-size: .96rem; font-weight: 400; letter-spacing: .01em;}
+.v-tag {color: var(--text); font-size: 1.02rem; font-weight: 500; letter-spacing: -.01em;}
+.v-hint {color: var(--muted); font-size: .87rem; font-weight: 300; margin-top: .3rem;}
 .v-meta {
     color: var(--faint); font-size: .74rem; margin-top: .9rem;
     font-family: 'JetBrains Mono', monospace; letter-spacing: .02em;
@@ -298,7 +300,9 @@ st.markdown(
     f"""
     <div class="v-head">
         <div class="v-mark">Vidora</div>
-        <div class="v-tag">Video and audio, one finished file.</div>
+        <div class="v-tag">Download videos in HD — with the sound included.</div>
+        <div class="v-hint">Paste a link, pick your quality, get one
+            ready-to-play file.</div>
         <div class="v-meta">v{vidora.__version__} &nbsp;·&nbsp; © {vidora.__year__}
             {vidora.__author__} &nbsp;·&nbsp; {vidora.__license__}</div>
     </div>
@@ -389,7 +393,9 @@ if url:
         unsafe_allow_html=True,
     )
 
-    st.markdown("<div class='v-label'>Choose a resolution</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='v-label'>Choose your quality</div>", unsafe_allow_html=True
+    )
 
     labels = [row_label(o) for o in options]
     picked = st.radio(
