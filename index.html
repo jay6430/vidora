@@ -166,6 +166,112 @@ h1 {
 .cursor { display: inline-block; width: 8px; background: var(--accent); animation: blink 1.05s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
+/* ---------------- install demo + app preview ---------------- */
+.demo-cap {
+  text-align: center; color: var(--faint); font-size: .72rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 18px;
+}
+.tbody.install { min-height: 290px; }
+
+.demo-arrow { text-align: center; padding: 22px 0 20px; }
+.demo-arrow span {
+  display: block; font-size: 1.5rem; color: var(--accent);
+  animation: bob 2.2s ease-in-out infinite; line-height: 1;
+}
+.demo-arrow p { color: var(--muted); font-size: .85rem; margin-top: 6px; font-weight: 300; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+/* browser window holding the app preview - dim until the demo "launches" it */
+.browser {
+  background: #0c0d10; border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden;
+  box-shadow: 0 26px 70px rgba(0,0,0,.5);
+  opacity: .34; filter: saturate(.4);
+  transition: opacity .7s ease, filter .7s ease, box-shadow .7s ease;
+}
+.browser.lit {
+  opacity: 1; filter: none;
+  box-shadow: 0 26px 70px rgba(0,0,0,.5), 0 0 0 1px rgba(94,234,212,.16);
+}
+@media (prefers-reduced-motion: reduce) {
+  .browser { opacity: 1; filter: none; }
+  .demo-arrow span { animation: none; }
+}
+.bbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: var(--surface-2); border-bottom: 1px solid var(--line);
+}
+.bbar .url {
+  flex: 1; margin-left: 10px; background: #0c0d10; border: 1px solid var(--line);
+  border-radius: 6px; padding: 4px 12px; font-size: .72rem; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.bbody {
+  padding: 30px 30px 34px; max-width: 520px; margin: 0 auto;
+  background:
+    radial-gradient(600px 300px at 15% 0%, rgba(94,234,212,.06), transparent 60%),
+    radial-gradient(500px 260px at 85% 0%, rgba(167,139,250,.05), transparent 55%);
+}
+
+.ui-head { text-align: center; margin-bottom: 22px; }
+.ui-mark {
+  font-size: 1.85rem; font-weight: 700; letter-spacing: -.04em; line-height: 1;
+  background: linear-gradient(100deg, var(--accent), var(--violet));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 6px;
+}
+.ui-tag { font-size: .82rem; font-weight: 500; color: var(--text); }
+.ui-tag .yt {
+  color: var(--accent); font-weight: 600;
+  border-bottom: 1.5px solid rgba(94,234,212,.35);
+}
+.ui-hint { font-size: .73rem; color: var(--muted); font-weight: 300; margin-top: 3px; }
+
+.ui-input {
+  background: var(--surface); border: 1px solid var(--accent-2);
+  box-shadow: 0 0 0 3px rgba(94,234,212,.09);
+  border-radius: 9px; padding: .62rem .8rem; font-size: .78rem;
+  color: var(--text); font-family: 'JetBrains Mono', monospace; margin-bottom: 9px;
+}
+.ui-btn {
+  border-radius: 9px; padding: .55rem; text-align: center;
+  font-size: .8rem; font-weight: 500;
+}
+.ui-btn.ghost { background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); }
+.ui-btn.primary {
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  color: #06231f; font-weight: 600; margin-top: 14px;
+}
+
+.ui-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 11px;
+  padding: .7rem .8rem; margin: 16px 0 4px; display: flex; gap: .75rem; align-items: center;
+}
+.ui-thumb {
+  width: 84px; height: 47px; border-radius: 5px; flex-shrink: 0;
+  background: linear-gradient(135deg, #2c3550, #47407a);
+}
+.ui-title { font-size: .8rem; font-weight: 600; }
+.ui-sub { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+
+.ui-label {
+  color: var(--faint); font-size: .62rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; margin: 16px 0 7px;
+}
+.ui-row {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: .48rem .7rem; margin-bottom: 5px;
+  font-family: 'JetBrains Mono', monospace; font-size: .71rem; color: var(--text);
+}
+.ui-row.on { border-color: var(--accent-2); background: rgba(94,234,212,.055); }
+.ui-row span:first-child { min-width: 62px; }
+.ui-row .c { color: var(--muted); min-width: 44px; }
+.ui-row .a { color: var(--accent); }
+.ui-row .s { margin-left: auto; color: var(--muted); }
+.ui-row .e { color: var(--faint); min-width: 32px; text-align: right; }
+.ui-row .pa { color: #4ade80; font-size: .66rem; }
+
 /* ---------------- features ---------------- */
 section { padding: 74px 0; }
 .sec-head { text-align: center; margin-bottom: 44px; }
@@ -285,8 +391,13 @@ footer a:hover { color: var(--accent); }
   .problem-grid { grid-template-columns: 1fr; }
   .arrow { transform: rotate(90deg); justify-content: center; }
   .tbody { font-size: .69rem; min-height: 380px; }
+  .tbody.install { min-height: 260px; }
   header { padding: 56px 0 40px; }
   .nav-links a:not(.btn) { display: none; }
+  .bbody { padding: 22px 16px 26px; }
+  .ui-row { font-size: .62rem; gap: 5px; padding: .42rem .5rem; }
+  .ui-row .pa { display: none; }
+  .ui-thumb { width: 66px; height: 37px; }
 }
 </style>
 </head>
@@ -299,6 +410,7 @@ footer a:hover { color: var(--accent); }
     <div class="nav-links">
       <a href="#how">How it works</a>
       <a href="#install">Install</a>
+      <a href="#cli">Command line</a>
       <a href="https://github.com/jay6430/vidora">GitHub</a>
     </div>
   </div>
@@ -308,10 +420,10 @@ footer a:hover { color: var(--accent); }
 
   <header>
     <div class="pill">◈ <b>Free &amp; open source</b> · macOS, Windows, Linux</div>
-    <h1>Download YouTube videos in HD.<br>With the sound.</h1>
+    <h1>Download YouTube videos in HD.</h1>
     <p class="lede">
       Paste a YouTube link, pick your quality — <b>4K, 1440p, 1080p, 720p</b> —
-      and get one ready-to-play file. No silent videos. No separate audio track.
+      and get one ready-to-play file. No separate audio track.
       No merging it yourself.
     </p>
     <p class="byline">A free desktop tool by Jay Kadam</p>
@@ -348,13 +460,59 @@ footer a:hover { color: var(--accent); }
   </div>
 
   <div class="terminal-wrap rv" id="how">
+
+    <div class="demo-cap">What you will actually see</div>
+
     <div class="terminal">
       <div class="tbar">
         <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-        <span>vidora — zsh</span>
+        <span id="install-title">Terminal</span>
       </div>
-      <div class="tbody" id="term"></div>
+      <div class="tbody install" id="install-term"></div>
     </div>
+
+    <div class="demo-arrow">
+      <span>↓</span>
+      <p>then it opens in your browser, on its own</p>
+    </div>
+
+    <!-- Browser window containing a to-scale replica of the actual app. -->
+    <div class="browser" id="app-shot">
+      <div class="bbar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">localhost:8501</div>
+      </div>
+      <div class="bbody">
+
+        <div class="ui-head">
+          <div class="ui-mark">Vidora</div>
+          <div class="ui-tag">Download <span class="yt">YouTube</span> videos in HD
+            — with the sound included.</div>
+          <div class="ui-hint">Paste a link, pick your quality, get one
+            ready-to-play file.</div>
+        </div>
+
+        <div class="ui-input">https://youtu.be/aqz-KE-bpKQ</div>
+        <div class="ui-btn ghost">Fetch video</div>
+
+        <div class="ui-card">
+          <div class="ui-thumb"></div>
+          <div>
+            <div class="ui-title">Big Buck Bunny 60fps 4K</div>
+            <div class="ui-sub">Blender Foundation &nbsp;·&nbsp; 10:34</div>
+          </div>
+        </div>
+
+        <div class="ui-label">Choose your quality</div>
+        <div class="ui-row"><span>2160p 60</span><span class="c">VP9</span><span class="a">+ audio</span><span class="s">~1.3 GB</span><span class="e">.mkv</span></div>
+        <div class="ui-row"><span>1440p 60</span><span class="c">VP9</span><span class="a">+ audio</span><span class="s">~480.8 MB</span><span class="e">.mkv</span></div>
+        <div class="ui-row on"><span>1080p 60</span><span class="c">H.264</span><span class="a">+ audio</span><span class="s">~275.0 MB</span><span class="e">.mp4</span><span class="pa">· plays anywhere</span></div>
+        <div class="ui-row"><span>720p 60</span><span class="c">H.264</span><span class="a">+ audio</span><span class="s">~172.9 MB</span><span class="e">.mp4</span><span class="pa">· plays anywhere</span></div>
+
+        <div class="ui-btn primary">Download 1080p with audio</div>
+      </div>
+    </div>
+
   </div>
 
   <section>
@@ -514,6 +672,21 @@ footer a:hover { color: var(--accent); }
     </div>
   </section>
 
+  <section id="cli">
+    <div class="sec-head rv">
+      <h2>Prefer the command line?</h2>
+      <p>The same tool without the browser. Installed alongside the app —
+         nothing extra to set up.</p>
+    </div>
+    <div class="terminal rv">
+      <div class="tbar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span>vidora — zsh</span>
+      </div>
+      <div class="tbody" id="term"></div>
+    </div>
+  </section>
+
 </div>
 
 <footer>
@@ -568,6 +741,96 @@ function detectOS() {
 
 const detected = detectOS();
 if (detected) selectOS(detected);
+
+/* ---- install demo: shows the visitor their own platform's output ---- */
+const INSTALL_OS = detected || 'mac';
+
+const SHELL_TITLE = {
+  win:   'Windows PowerShell',
+  mac:   'Terminal — zsh',
+  linux: 'Terminal — bash'
+};
+
+const PROMPT = {
+  win:   '<span class="c-dim">PS C:\\Users\\you></span> ',
+  mac:   '<span class="c-acc">$</span> ',
+  linux: '<span class="c-acc">$</span> '
+};
+
+const INSTALL_CMD = {
+  win:   'irm https://…/install.ps1 | iex',
+  mac:   'curl -fsSL https://…/install.sh | bash',
+  linux: 'curl -fsSL https://…/install.sh | bash'
+};
+
+// The box is drawn with ASCII on Windows, matching what install.ps1 prints.
+function installLines(os) {
+  const win = os === 'win';
+  const b = win
+    ? ['  +----------------------------------------------------------+',
+       '  |  VIDORA  -  HD video downloads, with the sound included  |',
+       '  +----------------------------------------------------------+']
+    : ['  ╭──────────────────────────────────────────────────────────╮',
+       '  │  VIDORA ·  HD video downloads, with the sound included   │',
+       '  ╰──────────────────────────────────────────────────────────╯'];
+  const tick = win ? '+' : '✓';
+  const dot  = win ? '.' : '·';
+  const ff   = win ? 'winget' : (os === 'mac' ? 'Homebrew' : 'apt');
+
+  return [
+    { t: PROMPT[os] + '<span class="c-wht">' + INSTALL_CMD[os] + '</span>', d: 420 },
+    { t: '', d: 160 },
+    { t: '<span class="c-dim">' + b[0] + '</span>', d: 26 },
+    { t: '<span class="c-dim">' + b[1].replace('VIDORA', '</span><span class="c-acc">VIDORA</span><span class="c-dim">') + '</span>', d: 26 },
+    { t: '<span class="c-dim">' + b[2] + '</span>', d: 26 },
+    { t: '<span class="c-dim">' + (win ? '                        (c) 2026 Jay Kadam  -  MIT setup'
+                                       : '                       © 2026 Jay Kadam   ·   MIT setup') + '</span>', d: 30 },
+    { t: '<span class="c-vio">' + (win ? '    Thanks to Ishan Mistry, whose idea set Vidora in motion.'
+                                       : '    Thanks to Ishan Mistry, whose idea set Vidora in motion.') + '</span>', d: 320 },
+    { t: '', d: 120 },
+    { t: '  <span class="c-dim">' + dot + '</span> Downloading Vidora…', d: 620 },
+    { t: '  <span class="c-grn">' + tick + '</span> Python: 3.12 found', d: 380 },
+    { t: '  <span class="c-grn">' + tick + '</span> ffmpeg: installed with ' + ff, d: 620 },
+    { t: '  <span class="c-dim">' + dot + '</span> Creating an isolated environment…', d: 560 },
+    { t: '  <span class="c-grn">' + tick + '</span> Environment created', d: 340 },
+    { t: '  <span class="c-dim">' + dot + '</span> Installing packages (yt-dlp, streamlit)…', d: 900 },
+    { t: '  <span class="c-grn">' + tick + '</span> Packages installed', d: 340 },
+    { t: '  <span class="c-grn">' + tick + '</span> Everything checks out', d: 480 },
+    { t: '', d: 140 },
+    { t: '  <span class="c-wht">Starting Vidora…</span>  <span class="c-dim">opening</span> <span class="c-acc">http://localhost:8501</span>', d: 900 },
+    { t: '', d: 100 },
+    { t: '  <span class="c-dim">You can now view your Streamlit app in your browser.</span>', d: 2800 }
+  ];
+}
+
+const installTerm = document.getElementById('install-term');
+document.getElementById('install-title').textContent = SHELL_TITLE[INSTALL_OS];
+
+function playInstall() {
+  const lines = installLines(INSTALL_OS);
+  let i = 0;
+  installTerm.innerHTML = '';
+  const shot = document.getElementById('app-shot');
+  shot.classList.remove('lit');
+
+  const step = () => {
+    if (i >= lines.length) { setTimeout(playInstall, 2200); return; }
+    const l = lines[i++];
+    installTerm.innerHTML += (l.t || '') + '\n';
+    installTerm.scrollTop = installTerm.scrollHeight;
+    // Light up the browser preview exactly when the app starts.
+    if (l.t && l.t.indexOf('localhost:8501') !== -1) shot.classList.add('lit');
+    setTimeout(step, l.d);
+  };
+  step();
+}
+
+let installStarted = false;
+new IntersectionObserver((es, obs) => {
+  es.forEach(e => {
+    if (e.isIntersecting && !installStarted) { installStarted = true; playInstall(); obs.disconnect(); }
+  });
+}, { threshold: .2 }).observe(installTerm);
 
 /* ---- copy buttons ---- */
 document.querySelectorAll('.copy').forEach(btn => {
