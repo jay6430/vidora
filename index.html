@@ -423,6 +423,12 @@ footer p { font-size: .82rem; color: var(--faint); line-height: 2; }
 footer a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); }
 footer a:hover { color: var(--accent); }
 
+/* authorship credit, deliberately quieter than the project line above it */
+footer .by { margin-top: 14px; font-size: .78rem; color: var(--faint); }
+footer .by a { color: var(--faint); border-bottom-color: transparent; }
+footer .by a:hover { color: var(--accent); border-bottom-color: var(--line); }
+footer .by .sep { margin: 0 7px; opacity: .55; }
+
 /* ---------------- reveal ---------------- */
 .rv { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
 .rv.in { opacity: 1; transform: none; }
@@ -749,10 +755,15 @@ footer a:hover { color: var(--accent); }
 <footer>
   <div class="wrap">
     <p>
-      <b style="color:var(--muted)">Vidora</b> v1.0.0 · © 2026
+      <b style="color:var(--muted)">Vidora</b> v1.1.0 · © 2026
       <a href="mailto:kadamjay100@gmail.com">Jay Kadam</a> · MIT licensed<br>
       Built on <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a> and
       <a href="https://ffmpeg.org/">FFmpeg</a>, which keep their own licenses.
+    </p>
+    <p class="by">
+      Site by <a href="https://kadamlabs.com" rel="me">Jay Kadam</a>
+      <span class="sep">·</span>
+      <a href="https://kadamlabs.com">kadamlabs.com</a>
     </p>
   </div>
 </footer>
