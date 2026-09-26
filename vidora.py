@@ -10,7 +10,7 @@ them for you, so nothing arrives silent.
 Also handles audio-only downloads, subtitles, playlists, and any other site
 yt-dlp supports.
 
-Author:   Jay Kadam <kadamjay100@gmail.com>
+Author:   Jay Kadam <jay@kadamlabs.com>
 License:  MIT - see LICENSE
 Version:  1.0.0
 
@@ -29,7 +29,7 @@ from pathlib import Path
 __app__ = "Vidora"
 __version__ = "1.1.0"
 __author__ = "Jay Kadam"
-__email__ = "kadamjay100@gmail.com"
+__email__ = "jay@kadamlabs.com"
 __license__ = "MIT"
 __year__ = "2026"
 __copyright__ = f"Copyright (c) {__year__} {__author__}"

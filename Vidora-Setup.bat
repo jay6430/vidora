@@ -2,7 +2,7 @@
 REM ===========================================================================
 REM  Vidora - Windows installer.  Just double-click this file.
 REM
-REM  Author:   Jay Kadam ^<kadamjay100@gmail.com^>
+REM  Author:   Jay Kadam ^<jay@kadamlabs.com^>
 REM  License:  MIT - see LICENSE
 REM
 REM  Downloads the installer to a real file and runs it with -File rather than

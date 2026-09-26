@@ -6,7 +6,7 @@ sound already in it. Runs on your own machine, on your own connection:
 
     python3 -m streamlit run vidora_ui.py
 
-Author:   Jay Kadam <kadamjay100@gmail.com>
+Author:   Jay Kadam <jay@kadamlabs.com>
 License:  MIT - see LICENSE
 Version:  1.0.0
 

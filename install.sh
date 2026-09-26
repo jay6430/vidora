@@ -2,7 +2,7 @@
 #
 # Vidora - one-command setup and launcher for macOS and Linux.
 #
-# Author:   Jay Kadam <kadamjay100@gmail.com>
+# Author:   Jay Kadam <jay@kadamlabs.com>
 # License:  MIT - see LICENSE
 #
 # Installs everything Vidora needs into a self-contained virtualenv inside this

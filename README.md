@@ -294,7 +294,7 @@ Thanks to **Ishan Mistry**, whose idea set Vidora in motion.
 
 ## Author
 
-**Jay Kadam** — [kadamjay100@gmail.com](mailto:kadamjay100@gmail.com)
+**Jay Kadam** — [jay@kadamlabs.com](mailto:jay@kadamlabs.com)
 
 ## License
 

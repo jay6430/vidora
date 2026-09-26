@@ -1,7 +1,7 @@
 <#
     Vidora - setup and launcher for Windows.
 
-    Author:   Jay Kadam <kadamjay100@gmail.com>
+    Author:   Jay Kadam <jay@kadamlabs.com>
     License:  MIT - see LICENSE
 
     Installs everything Vidora needs - including Python and ffmpeg if they are

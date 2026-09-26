@@ -2,7 +2,7 @@
 Offline checks for Vidora's format-selection logic, using a synthetic format
 list shaped like the one a video site actually returns.
 
-Author:   Jay Kadam <kadamjay100@gmail.com>
+Author:   Jay Kadam <jay@kadamlabs.com>
 License:  MIT - see LICENSE
 
 Run with:  python3 test_vidora.py

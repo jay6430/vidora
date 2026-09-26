@@ -2,7 +2,7 @@
 REM ===========================================================================
 REM  Vidora - opens the app.  This is what the Desktop shortcut points at.
 REM
-REM  Author:   Jay Kadam ^<kadamjay100@gmail.com^>
+REM  Author:   Jay Kadam ^<jay@kadamlabs.com^>
 REM  License:  MIT - see LICENSE
 REM
 REM  Named Start-Vidora rather than Vidora so it cannot collide with

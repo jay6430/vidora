@@ -2,7 +2,7 @@
 REM
 REM Vidora - command line launcher for Windows.
 REM
-REM Author:   Jay Kadam ^<kadamjay100@gmail.com^>
+REM Author:   Jay Kadam ^<jay@kadamlabs.com^>
 REM License:  MIT - see LICENSE
 REM
 REM Prefers the project's own virtualenv when one exists. Put this folder on

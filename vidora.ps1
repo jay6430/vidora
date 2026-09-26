@@ -1,7 +1,7 @@
 <#
     Vidora - launcher for Windows PowerShell.
 
-    Author:   Jay Kadam <kadamjay100@gmail.com>
+    Author:   Jay Kadam <jay@kadamlabs.com>
     License:  MIT - see LICENSE
 
     PowerShell will not run scripts by default. Allow local ones once with:
